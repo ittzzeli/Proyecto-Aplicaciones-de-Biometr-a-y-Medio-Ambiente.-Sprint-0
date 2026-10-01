@@ -11,12 +11,14 @@
 class Publicador {
 
 private:
+
   uint8_t beaconUUID[16] = {
     'E', 'P', 'S', 'G', '-', 'G', 'T', 'I',
     '-', 'P', 'R', 'O', 'Y', '-', '3', 'A'
   };
 
 public:
+
   EmisoraBLE laEmisora {
     "gatotico",
     0x004c,
@@ -37,19 +39,34 @@ public:
   // ------------------------------------------------------------
   static const bool MAJOR_COMO_CONTADOR = true;
 
+
+  // ------------------------------------------------------------
+  // --> Publicador() -->
+  // ------------------------------------------------------------
   Publicador() {
   }
 
+
+  // ------------------------------------------------------------
+  // --> encenderEmisora() -->
+  // ------------------------------------------------------------
   void encenderEmisora() {
     (*this).laEmisora.encenderEmisora();
   }
 
+
   // ------------------------------------------------------------
   // iBeacon enviado:
+  //
   //   Major = contador (modo prueba actual)
-  //           o OZONO=14 cuando MAJOR_COMO_CONTADOR=false
+  //           o OZONO = 14 cuando MAJOR_COMO_CONTADOR = false
   //
   //   Minor = 0 (fijado temporalmente para evitar variaciones)
+  // ------------------------------------------------------------
+
+  // ------------------------------------------------------------
+  // valorPPMx1000: N, contador: N, tiempoEspera: Z
+  // --> publicarOzono() -->
   // ------------------------------------------------------------
   void publicarOzono(uint16_t valorPPMx1000,
                      uint16_t contador,
@@ -59,9 +76,10 @@ public:
       ? contador
       : (uint16_t) MedicionesID::OZONO;
 
-    // La medida de O3 se sigue calculando, pero NO se envia en Minor.
-    // Por peticion para la prueba actual, Minor permanece siempre a 0.
+    // La medida de O3 se sigue calculando, pero NO se envía en Minor.
+    // Por petición para la prueba actual, Minor permanece siempre a 0.
     (void) valorPPMx1000;
+
     const uint16_t minor = 0;
 
     (*this).laEmisora.emitirAnuncioIBeacon(
@@ -72,6 +90,7 @@ public:
     );
 
     esperar(tiempoEspera);
+
     (*this).laEmisora.detenerAnuncio();
   }
 
