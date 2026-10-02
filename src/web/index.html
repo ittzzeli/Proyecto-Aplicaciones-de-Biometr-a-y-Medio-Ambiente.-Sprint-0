@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0"
+    >
+
+    <title>Mediciones</title>
+
+    <link
+        rel="stylesheet"
+        href="styles.css"
+    >
+</head>
+
+<body>
+
+    <!--
+        Bloque principal definido en el diseño de UX.
+        Los valores se rellenan desde JavaScript utilizando
+        la lógica fake del navegador.
+    -->
+    <main>
+
+        <section class="medicion">
+
+            <h1>Última medición</h1>
+
+            <div class="datos">
+
+                <span>Fecha</span>
+                <span id="fecha">--</span>
+
+                <span>Major</span>
+                <span id="major">--</span>
+
+                <span>Minor</span>
+                <span id="minor">--</span>
+
+                <span>TxPower</span>
+                <span id="txPower">--</span>
+
+            </div>
+
+            <p
+                id="error"
+                hidden
+            >
+            </p>
+
+        </section>
+
+    </main>
+
+
+    <!--
+        Primero se carga la lógica fake.
+        La interfaz nunca llama directamente al servidor REST.
+    -->
+    <script src="logica_fake/LogicaFakeNavegador.js"></script>
+
+    <script src="app.js"></script>
+
+</body>
+
+</html>
