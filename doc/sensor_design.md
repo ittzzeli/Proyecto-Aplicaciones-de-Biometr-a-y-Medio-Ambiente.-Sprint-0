@@ -1,6 +1,6 @@
 # Diseño del Componente
 
-El componente **sensor** se encarga de inicializar el hardware de medida, calibrar el sensor de ozono ULPSM-O3 968-046, obtener medidas analógicas de Vgas, Vref y Vtemp, calcular la concentración de O3 y publicar un anuncio BLE en formato iBeacon.
+El componente **sensor** inicializa el hardware de medida, calibra el sensor de ozono ULPSM-O3 968-046, obtiene las señales analógicas Vgas, Vref y Vtemp, calcula una concentración de O3 y publica un anuncio BLE en formato iBeacon.
 
 ## Tipos de datos
 
@@ -31,25 +31,33 @@ MedicionO3 = (
 MedicionesID = { OZONO }
 ```
 
-## Funciones principales del programa
+## Flujo principal
+
+```text
+setup()
+   |
+   +--> iniciarMedidor()
+   +--> calibrarAireLimpio()
+   +--> encenderEmisora()
+
+loop()
+   |
+   +--> medirOzono()
+   +--> escribir diagnóstico por puerto serie
+   +--> publicarOzono()
+   +--> esperar()
+```
 
 ```text
 inicializarPlaquita()
-
 setup()
-
 loop()
-
 tiempo: Z --> esperar()
 ```
 
-`setup()` inicializa el medidor, realiza la calibración de cero en aire limpio y enciende la emisora BLE.
-
-`loop()` obtiene una medición de ozono, muestra los valores de diagnóstico por puerto serie y solicita su publicación mediante iBeacon.
-
 ## Clase Medidor
 
-Responsabilidad: gestionar exclusivamente la adquisición y tratamiento de las señales analógicas del sensor ULPSM-O3 968-046.
+Responsabilidad: adquirir y tratar las señales analógicas del ULPSM-O3 968-046.
 
 ```text
                  ---------------- Medidor -----------------
@@ -78,50 +86,37 @@ Responsabilidad: gestionar exclusivamente la adquisición y tratamiento de las s
 calibracion: CalibracionO3 <-- calibrarAireLimpio() -->
                  |
                  |
-medicion: MedicionO3     <-- medirOzono() -->
+medicion: MedicionO3 <-- medirOzono() <--
                  |
                  |
-       offset: R         <-- getOffsetV() <--
+offset: R        <-- getOffsetV() <--
                  |
-                 |
- sensibilidad: R         <-- getSensibilidadVPorPPM() <--
+sensibilidad: R  <-- getSensibilidadVPorPPM() <--
                  |
                  ------------------------------------------
 ```
 
-La calibración calcula el cero del sensor mediante:
+La calibración y el cálculo principal son:
 
 ```text
 offset_v = vgas_aire_limpio - vref_aire_limpio
-```
-
-La sensibilidad eléctrica se obtiene mediante:
-
-```text
 sensibilidad_v_por_ppm = sensibilidad_na_por_ppm * tia_gain_kv_por_a * 10^-6
-```
-
-La concentración de ozono se calcula mediante:
-
-```text
 diferencia_v = vgas - vref
-
 diferencia_corregida_v = diferencia_v - offset_v
-
 ozono_ppm = diferencia_corregida_v / sensibilidad_v_por_ppm
 ```
 
-Si el medidor todavía no se ha calibrado o la sensibilidad es prácticamente cero, la concentración devuelta será 0. Los valores negativos producidos por pequeñas variaciones o ruido se limitan igualmente a 0.
-
 ## Clase Publicador
 
-Responsabilidad: transformar la información que debe publicarse en los campos utilizados por el iBeacon y solicitar a `EmisoraBLE` la emisión del anuncio.
+Responsabilidad: decidir los campos lógicos del iBeacon de O3 y delegar la emisión en `EmisoraBLE`.
 
 ```text
                  ---------------- Publicador ----------------
                  |
-                 | beacon_uuid: [N]_16
+                 | beacon_uuid: [ N ]_16
+                 | emisora: EmisoraBLE
                  | rssi: Z
+                 | major_como_contador: B
                  |
                  |
                  Publicador() -->
@@ -137,18 +132,16 @@ tiempo_espera: Z --> publicarOzono() -->
                  --------------------------------------------
 ```
 
-En el estado actual del Sprint 0:
+En el estado actual:
 
 ```text
 major = contador
 minor = 0
 ```
 
-La concentración de O3 se calcula internamente, pero temporalmente no se introduce en `minor`.
-
 ## Clase EmisoraBLE
 
-Responsabilidad: encapsular la comunicación BLE y la construcción/emisión del anuncio iBeacon.
+Responsabilidad: encapsular la configuración y emisión BLE/iBeacon.
 
 ```text
                  ---------------- EmisoraBLE ----------------
@@ -157,34 +150,33 @@ Responsabilidad: encapsular la comunicación BLE y la construcción/emisión del
                  | fabricante_id: N
                  | tx_power: Z
                  |
+                 | detenerAnuncio() -->
+                 | estaAnunciando() --> anunciando: B
+                 | carga: Text, tamanyo_carga: N
+                 | --> emitirAnuncioIBeaconLibre() -->
+                 | servicio: ServicioEnEmisora
+                 | --> anyadirServicio() --> resultado: B
+                 |
                  |
 nombre: Text,
 fabricante_id: N,
-tx_power: Z    --> EmisoraBLE() -->
+tx_power: Z      --> EmisoraBLE() -->
                  |
                  |
                  encenderEmisora() -->
                  |
                  |
-                 detenerAnuncio() -->
-                 |
-                 |
-anunciando: B  <-- estaAnunciando() <--
-                 |
-                 |
-beacon_uuid: [N]_16,
+beacon_uuid: [ N ]_16,
 major: N,
 minor: N,
-rssi: Z        --> emitirAnuncioIBeacon() -->
+rssi: Z          --> emitirAnuncioIBeacon() -->
                  |
                  --------------------------------------------
 ```
 
-`emitirAnuncioIBeacon()` detiene cualquier anuncio anterior, limpia los datos BLE previos, configura UUID, Major, Minor, RSSI, fabricante y potencia, y comienza un nuevo anuncio.
+La implementación conserva además operaciones auxiliares para callbacks, servicios y características BLE procedentes del código base.
 
 ## Clase LED
-
-Responsabilidad: encapsular el control del LED de la placa.
 
 ```text
                  ---------------- LED ----------------
@@ -195,15 +187,9 @@ Responsabilidad: encapsular el control del LED de la placa.
                  |
 numero: Z      --> LED() -->
                  |
-                 |
-                 encender() -->
-                 |
-                 |
-                 apagar() -->
-                 |
-                 |
-                 alternar() -->
-                 |
+                 | encender() -->
+                 | apagar() -->
+                 | alternar() -->
                  |
 tiempo: Z      --> brillar() -->
                  |
@@ -212,39 +198,42 @@ tiempo: Z      --> brillar() -->
 
 ## Clase PuertoSerie
 
-Responsabilidad: encapsular la comunicación utilizada para mostrar información de diagnóstico por puerto serie.
-
 ```text
                  ------------- PuertoSerie -------------
                  |
                  |
 baudios: Z      --> PuertoSerie() -->
                  |
+                 | esperarDisponible() -->
                  |
-                 esperarDisponible() -->
-                 |
-                 |
-mensaje: Text   --> escribir() -->
+mensaje: T      --> escribir() -->
                  |
                  ---------------------------------------
 ```
+
+`T` representa un tipo de dato imprimible por el puerto serie.
+
+## ServicioEnEmisora y características BLE
+
+`ServicioEnEmisora` y su clase interna `Caracteristica` encapsulan la funcionalidad GATT heredada del proyecto base: creación de UUID, configuración de propiedades/permisos, escritura, notificación, asociación de características y activación de servicios. Esta funcionalidad no participa en el flujo iBeacon activo del Sprint 0, pero forma parte del código existente del componente sensor.
 
 # Aclaraciones del Diseño
 
 - El sensor utilizado es el **SPEC Sensors ULPSM-O3 968-046**.
 - La implementación actual conecta `Vgas` a `A3`, `Vref` a `A4` y `Vtemp` a `A5`.
-- El ADC se configura a 12 bits y se trabaja con un rango de 0 a 3.3 V.
+- El ADC se configura a 12 bits y se trabaja con un rango considerado de 0 a 3.3 V.
 - Tanto la calibración como la medida utilizan un promedio de 50 muestras.
-- La calibración debe realizarse al arrancar mientras el sensor se encuentra en aire limpio.
-- La sensibilidad configurada actualmente en el código es `-59.20 nA/ppm` y el TIA Gain es `499 kV/A`.
-- La temperatura calculada a partir de `Vtemp` se utiliza como información de diagnóstico y no interviene actualmente en el cálculo de ppm.
-- El UUID empleado por el publicador corresponde a `EPSG-GTI-PROY-3A`.
-- Durante la prueba actual, `Major` se utiliza como contador de iteraciones y `Minor` se mantiene fijo a 0.
-- `EmisoraBLE.h` y `ServicioEnEmisora.h` contienen además funcionalidad BLE genérica heredada del proyecto base. Las operaciones de servicios y características BLE no forman parte del flujo activo del Sprint 0 descrito en este diseño.
+- La calibración se realiza al arrancar suponiendo que el sensor se encuentra en aire limpio.
+- La sensibilidad configurada actualmente es `-59.20 nA/ppm` y el TIA Gain es `499 kV/A`.
+- La temperatura calculada se utiliza como diagnóstico y no interviene en el cálculo actual de ppm.
+- El UUID del publicador corresponde a `EPSG-GTI-PROY-3A`.
+- El nombre BLE configurado actualmente en `Publicador` es `gatotico`.
+- Durante la prueba actual `Major` se utiliza como contador y `Minor` se mantiene fijo a `0`.
+- `EmisoraBLE.h` y `ServicioEnEmisora.h` conservan funcionalidad BLE/GATT genérica heredada que no forma parte del flujo activo de publicación de O3.
 
 # Reglas Generales
 
-- **Lenguaje de programación:** C++ para Arduino sobre la placa SparkFun Pro nRF52840 Mini, utilizando la librería Adafruit Bluefruit nRF52.
-- **Encabezados de funciones/métodos:** cada función o método deberá incluir en su cabecera su diseño lógico dentro de un bloque de comentarios delimitado por líneas discontinuas (`--------------------`).
-- **Legibilidad del código:** el código deberá ser claro y autoexplicativo, manteniendo separadas las responsabilidades de medición, publicación BLE y utilidades de hardware.
-- **Pruebas automatizadas:** se deberán generar pruebas unitarias o de integración para las funciones y métodos críticos siempre que puedan aislarse del hardware. Las operaciones que dependan directamente del ADC, BLE o periféricos deberán verificarse mediante pruebas de integración sobre la placa o mediante abstracciones/mocks cuando sea posible.
+- **Lenguaje de programación:** C++ para Arduino sobre SparkFun Pro nRF52840 Mini, utilizando la librería Adafruit Bluefruit nRF52.
+- **Encabezados de funciones/métodos:** cada función o método deberá incluir su diseño lógico dentro de un bloque de comentarios delimitado por líneas discontinuas (`--------------------`).
+- **Legibilidad del código:** el código deberá mantener separadas las responsabilidades de medición, publicación iBeacon, comunicación BLE, puerto serie y utilidades de hardware.
+- **Pruebas automatizadas:** se deberán generar pruebas unitarias o de integración para las funciones y métodos críticos. Las operaciones dependientes directamente de ADC, BLE o periféricos deberán aislarse mediante mocks/abstracciones cuando sea viable y complementarse con pruebas de integración sobre la placa.
