@@ -1,13 +1,39 @@
 <?php
 
-require_once "ServidorREST.php";
+// ------------------------------------------------------------
+// Archivo: ServidorRESTTest.php
+//
+// Descripción:
+// Pruebas automatizadas del componente communication.
+//
+// Comprueba las rutas REST del Sprint 0 utilizando una
+// lógica de negocio falsa para evitar depender de MySQL.
+//
+// Autor: Elia
+// Fecha: 08/10/2026
+//
+// Aportación:
+// Pruebas de integración de ServidorREST con una
+// implementación falsa de business_logic.
+//
+// Copyright:
+// Uso académico - Proyecto de Biometría y Medio Ambiente.
+// ------------------------------------------------------------
+
+
+require_once __DIR__ . "/ServidorREST.php";
 
 
 // ------------------------------------------------------------
-// Lógica de negocio falsa utilizada exclusivamente
-// durante los tests del servidor REST.
+// LogicaNegocioFake
+//
+// Responsabilidad:
+// Simular el componente business_logic durante los tests.
+//
+// Permite comprobar que communication delega correctamente
+// en leerDatos() y mostrarDatos() sin utilizar una base de
+// datos real.
 // ------------------------------------------------------------
-
 class LogicaNegocioFake
 {
     public int $vecesLeerDatos = 0;
@@ -16,23 +42,33 @@ class LogicaNegocioFake
 
     public ?object $ultimaMedicion = null;
 
+    public bool $resultadoLeerDatos = true;
+
 
     // ------------------------------------------------------------
     // medicion: Medicion --> leerDatos() --> resultado: B
     // ------------------------------------------------------------
-    public function leerDatos(object $medicion): bool
-    {
+    //
+    // Simula el almacenamiento de una medición.
+    // ------------------------------------------------------------
+    public function leerDatos(
+        object $medicion
+    ): bool {
+
         $this->vecesLeerDatos++;
 
         $this->ultimaMedicion =
             $medicion;
 
-        return true;
+        return $this->resultadoLeerDatos;
     }
 
 
     // ------------------------------------------------------------
-    // mostrarDatos() --> medicion: Medicion
+    // mostrarDatos() --> medicion: MedicionAlmacenada
+    // ------------------------------------------------------------
+    //
+    // Simula la recuperación de la última medición.
     // ------------------------------------------------------------
     public function mostrarDatos(): ?object
     {
@@ -44,9 +80,13 @@ class LogicaNegocioFake
 
 
 // ------------------------------------------------------------
-// Función auxiliar para los tests.
+// condicion: B, mensaje: Text --> comprobar() -->
 // ------------------------------------------------------------
-
+//
+// Comprueba el resultado de un test.
+//
+// Si la condición es falsa lanza una excepción.
+// ------------------------------------------------------------
 function comprobar(
     bool $condicion,
     string $mensaje
@@ -55,45 +95,56 @@ function comprobar(
     if (!$condicion) {
 
         throw new Exception(
-            "TEST FALLIDO: " . $mensaje
+            "TEST FALLIDO: "
+            . $mensaje
         );
     }
 
-    echo "OK - "
+
+    echo
+        "OK - "
         . $mensaje
         . PHP_EOL;
 }
 
 
 // ------------------------------------------------------------
-// Preparar servidor de pruebas.
+// Preparar el servidor de pruebas.
 // ------------------------------------------------------------
 
 $logica =
     new LogicaNegocioFake();
 
+
 $servidor =
-    new ServidorREST($logica);
+    new ServidorREST(
+        $logica
+    );
 
 
 // ============================================================
 // TEST 1
-// POST /medicion con datos correctos.
+//
+// POST /medicion con una Medicion correcta.
 // ============================================================
 
-$jsonCorrecto = json_encode([
-    "uuid" =>
-        "45505347-2D47-5449-2D50-524F592D3341",
+$jsonCorrecto =
+    json_encode([
+        "uuid" =>
+            "45505347-2D47-5449-2D50-524F592D3341",
 
-    "fecha" =>
-        "2026-10-01 19:00:00",
+        "fecha" =>
+            "2026-10-08 16:00:00",
 
-    "major" => 20,
+        "major" =>
+            2821,
 
-    "minor" => 0,
+        "minor" =>
+            1234,
 
-    "TxPower" => -53
-]);
+        "TxPower" =>
+            -53
+    ]);
 
 
 $respuesta =
@@ -106,13 +157,14 @@ $respuesta =
 
 comprobar(
     $respuesta["codigo"] === 201,
-    "POST /medicion acepta datos correctos"
+    "POST /medicion acepta una Medicion correcta"
 );
 
 
 // ============================================================
 // TEST 2
-// Comprobar que POST utiliza leerDatos().
+//
+// Comprobar que POST /medicion delega en leerDatos().
 // ============================================================
 
 comprobar(
@@ -123,44 +175,96 @@ comprobar(
 
 // ============================================================
 // TEST 3
-// Comprobar que la respuesta del POST es JSON.
+//
+// Comprobar que POST /medicion devuelve JSON.
 // ============================================================
 
-comprobar(
+$contenidoPost =
     json_decode(
         $respuesta["json"]
-    ) !== null,
+    );
 
-    "POST /medicion devuelve JSON"
+
+comprobar(
+    is_object($contenidoPost),
+    "POST /medicion devuelve JSON valido"
 );
 
 
 // ============================================================
 // TEST 4
-// POST /medicion con datos incorrectos.
+//
+// Comprobar que communication transforma correctamente
+// el JSON recibido en una Medicion.
 // ============================================================
 
-$jsonIncorrecto = json_encode([
-    "uuid" => "UUID-INCOMPLETO",
-    "major" => 20
-]);
+comprobar(
+    $logica->ultimaMedicion !== null,
+    "POST /medicion entrega una Medicion a business_logic"
+);
 
 
-$respuestaIncorrecta =
+comprobar(
+    $logica->ultimaMedicion->uuid
+        ===
+    "45505347-2D47-5449-2D50-524F592D3341",
+
+    "UUID recibido correctamente"
+);
+
+
+comprobar(
+    $logica->ultimaMedicion->major === 2821,
+    "Major recibido correctamente"
+);
+
+
+comprobar(
+    $logica->ultimaMedicion->minor === 1234,
+    "Minor recibido correctamente"
+);
+
+
+comprobar(
+    $logica->ultimaMedicion->TxPower === -53,
+    "TxPower recibido correctamente"
+);
+
+
+// ============================================================
+// TEST 5
+//
+// POST /medicion con una Medicion incompleta.
+// ============================================================
+
+$jsonIncompleto =
+    json_encode([
+        "uuid" =>
+            "UUID-INCOMPLETO",
+
+        "major" =>
+            2821
+    ]);
+
+
+$respuestaIncompleta =
     $servidor->manejarPeticion(
         "POST",
         "/medicion",
-        $jsonIncorrecto
+        $jsonIncompleto
     );
 
 
 comprobar(
-    $respuestaIncorrecta["codigo"] === 400,
-    "POST /medicion rechaza datos incorrectos"
+    $respuestaIncompleta["codigo"] === 400,
+    "POST /medicion rechaza una Medicion incompleta"
 );
 
 
-// Comprobar que leerDatos() NO se ejecutó otra vez.
+// ------------------------------------------------------------
+// leerDatos() no debe haberse ejecutado nuevamente.
+// ------------------------------------------------------------
+
 comprobar(
     $logica->vecesLeerDatos === 1,
     "POST incorrecto no utiliza leerDatos()"
@@ -168,7 +272,28 @@ comprobar(
 
 
 // ============================================================
-// TEST 5
+// TEST 6
+//
+// POST /medicion con JSON incorrecto.
+// ============================================================
+
+$respuestaJsonIncorrecto =
+    $servidor->manejarPeticion(
+        "POST",
+        "/medicion",
+        "{esto no es json}"
+    );
+
+
+comprobar(
+    $respuestaJsonIncorrecto["codigo"] === 400,
+    "POST /medicion rechaza JSON incorrecto"
+);
+
+
+// ============================================================
+// TEST 7
+//
 // GET /medicion.
 // ============================================================
 
@@ -186,8 +311,9 @@ comprobar(
 
 
 // ============================================================
-// TEST 6
-// Comprobar que GET utiliza mostrarDatos().
+// TEST 8
+//
+// Comprobar que GET /medicion delega en mostrarDatos().
 // ============================================================
 
 comprobar(
@@ -197,8 +323,9 @@ comprobar(
 
 
 // ============================================================
-// TEST 7
-// Comprobar que GET devuelve JSON.
+// TEST 9
+//
+// Comprobar que GET /medicion devuelve JSON válido.
 // ============================================================
 
 $medicionRecuperada =
@@ -209,39 +336,42 @@ $medicionRecuperada =
 
 comprobar(
     is_object($medicionRecuperada),
-    "GET /medicion devuelve JSON"
+    "GET /medicion devuelve JSON valido"
 );
 
 
 // ============================================================
-// TEST 8
-// Comprobar los datos devueltos.
+// TEST 10
+//
+// Comprobar los datos devueltos por GET /medicion.
 // ============================================================
 
 comprobar(
-    $medicionRecuperada->uuid ===
-        "45505347-2D47-5449-2D50-524F592D3341",
+    $medicionRecuperada->uuid
+        ===
+    "45505347-2D47-5449-2D50-524F592D3341",
 
     "UUID correcto"
 );
 
 
 comprobar(
-    $medicionRecuperada->fecha ===
-        "2026-10-01 19:00:00",
+    $medicionRecuperada->fecha
+        ===
+    "2026-10-08 16:00:00",
 
     "Fecha correcta"
 );
 
 
 comprobar(
-    $medicionRecuperada->major === 20,
+    $medicionRecuperada->major === 2821,
     "Major correcto"
 );
 
 
 comprobar(
-    $medicionRecuperada->minor === 0,
+    $medicionRecuperada->minor === 1234,
     "Minor correcto"
 );
 
@@ -251,6 +381,76 @@ comprobar(
     "TxPower correcto"
 );
 
+
+// ============================================================
+// TEST 11
+//
+// GET /medicion cuando no existe ninguna medición.
+// ============================================================
+
+$logica->ultimaMedicion =
+    null;
+
+
+$respuestaSinMediciones =
+    $servidor->manejarPeticion(
+        "GET",
+        "/medicion"
+    );
+
+
+comprobar(
+    $respuestaSinMediciones["codigo"] === 404,
+    "GET /medicion devuelve 404 si no hay mediciones"
+);
+
+
+// ============================================================
+// TEST 12
+//
+// POST /medicion cuando business_logic no puede almacenar.
+// ============================================================
+
+$logica->resultadoLeerDatos =
+    false;
+
+
+$respuestaErrorNegocio =
+    $servidor->manejarPeticion(
+        "POST",
+        "/medicion",
+        $jsonCorrecto
+    );
+
+
+comprobar(
+    $respuestaErrorNegocio["codigo"] === 500,
+    "POST /medicion devuelve 500 si leerDatos() falla"
+);
+
+
+// ============================================================
+// TEST 13
+//
+// Ruta inexistente.
+// ============================================================
+
+$respuestaRutaIncorrecta =
+    $servidor->manejarPeticion(
+        "GET",
+        "/ruta-inexistente"
+    );
+
+
+comprobar(
+    $respuestaRutaIncorrecta["codigo"] === 404,
+    "Una ruta inexistente devuelve 404"
+);
+
+
+// ============================================================
+// Resultado final.
+// ============================================================
 
 echo PHP_EOL;
 

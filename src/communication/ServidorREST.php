@@ -1,14 +1,28 @@
 <?php
 
 // ------------------------------------------------------------
-// ServidorREST
+// Archivo: ServidorREST.php
 //
-// Responsabilidad:
-// Recibir las peticiones REST y delegar el trabajo
-// en la lógica de negocio.
+// Descripción:
+// Implementa el componente de comunicación REST del Sprint 0.
 //
-// Este componente NO accede directamente a la base de datos.
+// Recibe peticiones HTTP ya separadas en método, ruta y cuerpo,
+// transforma los datos recibidos y delega las operaciones en
+// el componente business_logic.
+//
+// Este componente no accede directamente a la base de datos.
+//
+// Autor: Elia
+// Fecha: 08/10/2026
+//
+// Aportación:
+// Adaptación del servidor REST para mantener una separación
+// completa entre communication y business_logic.
+//
+// Copyright:
+// Uso académico - Proyecto de Biometría y Medio Ambiente.
 // ------------------------------------------------------------
+
 
 class ServidorREST
 {
@@ -16,7 +30,11 @@ class ServidorREST
 
 
     // ------------------------------------------------------------
-    // logica: LogicaNegocio --> ServidorREST()
+    // logica: LogicaNegocio --> ServidorREST() -->
+    // ------------------------------------------------------------
+    //
+    // Recibe una referencia al componente business_logic
+    // que será utilizado para almacenar y recuperar mediciones.
     // ------------------------------------------------------------
     public function __construct(object $logica)
     {
@@ -25,12 +43,17 @@ class ServidorREST
 
 
     // ------------------------------------------------------------
-    // metodo: Text, ruta: Text, cuerpo: Text
+    // metodo: Text,
+    // ruta: Text,
+    // cuerpo: Text
     // --> manejarPeticion()
-    // --> respuesta
+    // --> respuesta: RespuestaREST
     // ------------------------------------------------------------
     //
-    // Gestiona únicamente:
+    // Determina qué operación REST debe ejecutarse según
+    // el método HTTP y la ruta recibidos.
+    //
+    // Rutas disponibles:
     //
     // POST /medicion
     // GET  /medicion
@@ -41,98 +64,170 @@ class ServidorREST
         string $cuerpo = ""
     ): array {
 
-        if ($metodo === "POST" && $ruta === "/medicion") {
-            return $this->postMedicion($cuerpo);
+        if (
+            $metodo === "POST"
+            &&
+            $ruta === "/medicion"
+        ) {
+
+            return $this->postMedicion(
+                $cuerpo
+            );
         }
 
-        if ($metodo === "GET" && $ruta === "/medicion") {
+
+        if (
+            $metodo === "GET"
+            &&
+            $ruta === "/medicion"
+        ) {
+
             return $this->getMedicion();
         }
 
-        return $this->crearRespuesta(
-            404,
+
+        $json = json_encode(
             [
                 "error" => "Ruta no encontrada"
-            ]
+            ],
+            JSON_UNESCAPED_UNICODE
+        );
+
+
+        return $this->crearRespuesta(
+            404,
+            $json
         );
     }
 
 
     // ------------------------------------------------------------
-    // json: Text --> postMedicion() --> respuesta
+    // json: Text
+    // --> postMedicion()
+    // --> respuesta: RespuestaREST
     // ------------------------------------------------------------
     //
-    // Convierte el JSON recibido en una Medicion
-    // y delega su almacenamiento en leerDatos().
+    // Convierte el JSON recibido en una Medicion.
+    //
+    // Comprueba que existan los campos necesarios y delega
+    // el almacenamiento en business_logic.leerDatos().
     // ------------------------------------------------------------
-    private function postMedicion(string $json): array
-    {
-        $medicion = json_decode($json);
+    private function postMedicion(
+        string $json
+    ): array {
+
+        $medicion =
+            json_decode($json);
 
 
-        // Comprobar que el JSON representa un objeto.
+        // --------------------------------------------------------
+        // Comprobar que el JSON recibido representa un objeto.
+        // --------------------------------------------------------
+
         if (!is_object($medicion)) {
+
+            $respuestaJson = json_encode(
+                [
+                    "error" => "JSON incorrecto"
+                ],
+                JSON_UNESCAPED_UNICODE
+            );
+
 
             return $this->crearRespuesta(
                 400,
-                [
-                    "error" => "JSON incorrecto"
-                ]
+                $respuestaJson
             );
         }
 
 
-        // Comprobar que existen exactamente los datos
-        // necesarios para una Medicion.
+        // --------------------------------------------------------
+        // Comprobar que existen todos los campos necesarios
+        // para construir una Medicion.
+        // --------------------------------------------------------
+
         if (
-            !isset($medicion->uuid) ||
-            !isset($medicion->fecha) ||
-            !isset($medicion->major) ||
-            !isset($medicion->minor) ||
+            !isset($medicion->uuid)
+            ||
+            !isset($medicion->fecha)
+            ||
+            !isset($medicion->major)
+            ||
+            !isset($medicion->minor)
+            ||
             !isset($medicion->TxPower)
         ) {
 
-            return $this->crearRespuesta(
-                400,
+            $respuestaJson = json_encode(
                 [
                     "error" => "Medicion incorrecta"
-                ]
+                ],
+                JSON_UNESCAPED_UNICODE
+            );
+
+
+            return $this->crearRespuesta(
+                400,
+                $respuestaJson
             );
         }
 
 
-        // El servidor REST no guarda los datos.
-        // Delega esa responsabilidad en la lógica de negocio.
+        // --------------------------------------------------------
+        // communication no guarda directamente la medición.
+        //
+        // La operación se delega en business_logic.
+        // --------------------------------------------------------
+
         $resultado =
-            $this->logica->leerDatos($medicion);
+            $this->logica->leerDatos(
+                $medicion
+            );
 
 
         if (!$resultado) {
 
+            $respuestaJson = json_encode(
+                [
+                    "error" =>
+                        "No se pudo guardar la Medicion"
+                ],
+                JSON_UNESCAPED_UNICODE
+            );
+
+
             return $this->crearRespuesta(
                 500,
-                [
-                    "error" => "No se pudo guardar la Medicion"
-                ]
+                $respuestaJson
             );
         }
 
 
+        $respuestaJson = json_encode(
+            [
+                "resultado" =>
+                    "Medicion almacenada"
+            ],
+            JSON_UNESCAPED_UNICODE
+        );
+
+
         return $this->crearRespuesta(
             201,
-            [
-                "resultado" => "Medicion almacenada"
-            ]
+            $respuestaJson
         );
     }
 
 
     // ------------------------------------------------------------
-    // getMedicion() --> respuesta
+    // getMedicion()
+    // --> respuesta: RespuestaREST
     // ------------------------------------------------------------
     //
-    // Solicita a la lógica de negocio la última Medicion
-    // almacenada y la devuelve en formato JSON.
+    // Solicita al componente business_logic la última
+    // medición almacenada.
+    //
+    // Si existe, la convierte a JSON.
     // ------------------------------------------------------------
     private function getMedicion(): array
     {
@@ -142,41 +237,53 @@ class ServidorREST
 
         if ($medicion === null) {
 
+            $respuestaJson = json_encode(
+                [
+                    "error" =>
+                        "No hay mediciones"
+                ],
+                JSON_UNESCAPED_UNICODE
+            );
+
+
             return $this->crearRespuesta(
                 404,
-                [
-                    "error" => "No hay mediciones"
-                ]
+                $respuestaJson
             );
         }
 
 
+        $respuestaJson = json_encode(
+            $medicion,
+            JSON_UNESCAPED_UNICODE
+        );
+
+
         return $this->crearRespuesta(
             200,
-            $medicion
+            $respuestaJson
         );
     }
 
 
     // ------------------------------------------------------------
-    // codigo: N, datos: Object
+    // codigo: N,
+    // json: Text
     // --> crearRespuesta()
-    // --> respuesta
+    // --> respuesta: RespuestaREST
     // ------------------------------------------------------------
     //
-    // Crea una respuesta preparada para ser enviada como JSON.
+    // Construye una respuesta REST formada por un código
+    // HTTP y un cuerpo JSON.
     // ------------------------------------------------------------
     private function crearRespuesta(
         int $codigo,
-        mixed $datos
+        string $json
     ): array {
 
         return [
             "codigo" => $codigo,
-            "json" => json_encode(
-                $datos,
-                JSON_UNESCAPED_UNICODE
-            )
+            "json" => $json
         ];
     }
 }
