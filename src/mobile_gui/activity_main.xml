@@ -1,0 +1,105 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<androidx.constraintlayout.widget.ConstraintLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+
+    android:id="@+id/main"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+
+    android:padding="24dp"
+
+    tools:context=".MainActivity">
+
+
+    <!-- Título de la aplicación. -->
+
+    <TextView
+        android:id="@+id/textoTitulo"
+
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+
+        android:text="Biometría - Sprint 0"
+        android:textSize="24sp"
+
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent" />
+
+
+    <!-- Busca todos los dispositivos BLE cercanos. -->
+
+    <Button
+        android:id="@+id/botonBuscarTodos"
+
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+
+        android:layout_marginTop="40dp"
+
+        android:text="Buscar todos los dispositivos BTLE"
+
+        app:layout_constraintTop_toBottomOf="@id/textoTitulo"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent" />
+
+
+    <!-- Detiene el escaneo Bluetooth. -->
+
+    <Button
+        android:id="@+id/botonDetenerBusqueda"
+
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+
+        android:layout_marginTop="16dp"
+
+        android:text="Detener búsqueda"
+
+        app:layout_constraintTop_toBottomOf="@id/botonBuscarTodos"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent" />
+
+
+    <!-- Busca únicamente nuestro beacon "Elia_GTI". -->
+
+    <Button
+        android:id="@+id/botonBuscarEliaGTI"
+
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+
+        android:layout_marginTop="16dp"
+
+        android:text="Buscar Elia_GTI"
+
+        app:layout_constraintTop_toBottomOf="@id/botonDetenerBusqueda"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent" />
+
+
+    <!--
+         Zona de información.
+         Aquí mostraremos posteriormente el beacon detectado.
+          -->
+
+    <TextView
+        android:id="@+id/textoEstado"
+
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+
+        android:layout_marginTop="32dp"
+
+        android:text="Esperando búsqueda..."
+        android:textSize="16sp"
+
+        app:layout_constraintTop_toBottomOf="@id/botonBuscarEliaGTI"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent" />
+
+
+</androidx.constraintlayout.widget.ConstraintLayout>
