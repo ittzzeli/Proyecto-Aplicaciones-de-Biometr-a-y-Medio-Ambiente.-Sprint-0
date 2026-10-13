@@ -10,7 +10,7 @@
 
 #include <cassert>
 #include <iostream>
-#include "../../src/sensor/SensorSprint0/CodificadorMajor.h"
+#include "CodificadorMajor.h"
 
 int main() {
   // O3 = 11 = 0x0B, contador = 5 = 0x05
