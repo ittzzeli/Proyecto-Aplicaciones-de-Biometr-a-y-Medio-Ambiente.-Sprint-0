@@ -2,28 +2,33 @@
 
 El componente **database** almacena las mediciones recibidas por el sistema.
 
-Durante el Sprint 0 utiliza una única tabla denominada `Medicion`.
+Durante el Sprint 0 utiliza una única tabla denominada `MEDICIONES`.
 
-Este componente no contiene lógica de negocio ni mecanismos de comunicación HTTP.
+La información almacenada corresponde a los datos útiles obtenidos de la trama iBeacon:
+
+- `valor` se obtiene del campo Minor.
+- `fecha_hora` corresponde al momento de la medición.
+- `identificador_sensor` se obtiene del UUID.
+- `tipo` se obtiene de la parte correspondiente al tipo dentro del Major.
+
+El contador contenido en el Major se utiliza para controlar mediciones repetidas, pero no se almacena en la base de datos.
+
+TxPower tampoco se almacena.
 
 ```text
 ====================================================================================
-TABLE: Medicion
+TABLE: MEDICIONES
 
-DESCRIPTION: Almacena las mediciones recibidas por el sistema.
+DESCRIPTION: Almacena las mediciones recibidas por los sensores.
 
 COLUMNS:
 
-+ id | INT | NOT NULL | AUTO_INCREMENT
-+ uuid | VARCHAR(36) | NOT NULL
-+ fecha | DATETIME | NOT NULL
-+ major | INT | NOT NULL
-+ minor | INT | NOT NULL
-+ TxPower | INT | NOT NULL
++ valor | INT | NOT NULL
++ fecha_hora | DATETIME | NOT NULL
++ identificador_sensor | VARCHAR(36) | NOT NULL
++ tipo | INT | NOT NULL
 
-PRIMARY KEY:
-
-+ id
+PRIMARY KEY: fecha_hora, identificador_sensor
 
 FOREIGN KEYS:
 
@@ -31,63 +36,69 @@ FOREIGN KEYS:
 
 CONSTRAINTS:
 
-+ id se genera automáticamente mediante AUTO_INCREMENT.
-+ uuid no puede ser NULL.
-+ fecha no puede ser NULL.
-+ major no puede ser NULL.
-+ minor no puede ser NULL.
-+ TxPower no puede ser NULL.
-+ Cada fila representa una única medición almacenada.
++ valor no puede ser NULL.
++ fecha_hora no puede ser NULL.
++ identificador_sensor no puede ser NULL.
++ tipo no puede ser NULL.
++ La combinación de fecha_hora e identificador_sensor identifica de forma única una medición.
 ====================================================================================
+```
+
+## Tipo Medicion
+
+```text
+Medicion = (
+    valor: Z,
+    fecha_hora: Text,
+    identificador_sensor: Text,
+    tipo: Z
+)
 ```
 
 ## Relación con business_logic
 
-El acceso a la tabla `Medicion` se realiza desde el componente `business_logic`.
-
-El componente `database` no conoce HTTP, REST ni JSON.
-
-El flujo de almacenamiento es:
+El acceso a la tabla `MEDICIONES` se realiza desde el componente `business_logic`.
 
 ```text
 business_logic
      |
      v
-Tabla Medicion
+MEDICIONES
 ```
 
-Las operaciones utilizadas por `business_logic` son:
+Para almacenar una medición se utiliza:
 
 ```text
 INSERT
 ```
 
-para almacenar una nueva medición y:
+Para recuperar la última medición almacenada se utiliza:
 
 ```text
 SELECT
 ```
 
-para recuperar la última medición almacenada.
+El componente `database` no conoce HTTP, REST, JSON ni mecanismos de comunicación.
 
 # Aclaraciones del Diseño
 
-- Solo existe la tabla `Medicion`.
-- `id` es una clave técnica interna de la base de datos.
-- `id` se genera automáticamente y no forma parte de la medición enviada por los clientes.
-- `uuid` se almacena como `VARCHAR(36)`.
-- `fecha` se almacena como `DATETIME`.
-- `major`, `minor` y `TxPower` se almacenan como `INT`.
+- Solo existe la tabla `MEDICIONES`.
+- No existe un campo `id`.
+- La clave primaria es compuesta por `fecha_hora` e `identificador_sensor`.
+- `identificador_sensor` corresponde al UUID recibido mediante iBeacon.
+- `valor` corresponde al valor obtenido del Minor.
+- `tipo` corresponde únicamente al tipo extraído del Major.
+- El contador incluido en el Major no se almacena.
+- Major y Minor completos no se almacenan.
+- TxPower no se almacena.
 - No existen claves foráneas durante el Sprint 0.
-- No existen relaciones con otras tablas.
-- El componente `business_logic` es responsable de realizar las operaciones de acceso a esta tabla.
-- `database_test.sql` contiene pruebas sencillas de inserción y recuperación de mediciones.
+- El componente `business_logic` realiza las operaciones de acceso a la tabla.
 
 # Reglas Generales
 
 - **Lenguaje de Programación:** SQL para MySQL/MariaDB.
 - **Formato del Diseño:** las tablas deberán documentarse mediante `TABLE`, `DESCRIPTION`, `COLUMNS`, `PRIMARY KEY`, `FOREIGN KEYS` y `CONSTRAINTS`.
-- **Encabezados de Funciones/Métodos:** no aplica a las sentencias SQL de definición de tabla. Si posteriormente se añadieran funciones o procedimientos, deberán incluir su diseño lógico dentro de comentarios delimitados por líneas discontinuas (`--------------------`).
-- **Legibilidad del Código:** las sentencias SQL deberán utilizar los mismos nombres de tabla y columnas definidos en este diseño.
+- **Encabezados de Funciones/Métodos:** si posteriormente se añadieran funciones o procedimientos SQL, deberán incluir su diseño lógico dentro de comentarios delimitados por líneas discontinuas (`--------------------`).
+- **Legibilidad del Código:** los nombres de tabla y columnas utilizados en SQL deberán coincidir exactamente con los definidos en este diseño.
 - **Separación de Responsabilidades:** la base de datos no contendrá mecanismos HTTP, REST ni lógica de comunicación.
-- **Pruebas Automatizadas:** se deberán mantener pruebas SQL de inserción y consulta que permitan comprobar que las mediciones se almacenan, que `id` se genera automáticamente y que los datos pueden recuperarse.
+- **Pruebas Automatizadas:** se deberán mantener pruebas de inserción y recuperación de mediciones.

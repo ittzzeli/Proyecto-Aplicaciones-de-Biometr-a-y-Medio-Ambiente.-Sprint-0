@@ -2,22 +2,36 @@
 -- Archivo: database.sql
 --
 -- Descripción:
--- Define la tabla utilizada por el Sprint 0 para almacenar
--- las mediciones recibidas por el sistema.
+-- Define la tabla MEDICIONES utilizada durante el Sprint 0.
 --
--- Autor: Elia
--- Fecha: 08/10/2026
+-- La tabla almacena únicamente los datos útiles obtenidos
+-- a partir de la trama iBeacon:
+--
+-- - valor: obtenido del Minor.
+-- - fecha_hora: momento de la medición.
+-- - identificador_sensor: obtenido del UUID.
+-- - tipo: extraído del Major.
+--
+-- Autor: Élia Garcia Pons
+-- Fecha: 13/10/2026
 --
 -- Copyright:
 -- Uso académico - Proyecto de Biometría y Medio Ambiente.
 -- ------------------------------------------------------------
 
 
-CREATE TABLE Medicion (
-    id INT AUTO_INCREMENT PRIMARY KEY,
-    uuid VARCHAR(36) NOT NULL,
-    fecha DATETIME NOT NULL,
-    major INT NOT NULL,
-    minor INT NOT NULL,
-    TxPower INT NOT NULL
+CREATE TABLE MEDICIONES (
+
+    valor INT NOT NULL,
+
+    fecha_hora DATETIME NOT NULL,
+
+    identificador_sensor VARCHAR(36) NOT NULL,
+
+    tipo INT NOT NULL,
+
+    PRIMARY KEY (
+        fecha_hora,
+        identificador_sensor
+    )
 );

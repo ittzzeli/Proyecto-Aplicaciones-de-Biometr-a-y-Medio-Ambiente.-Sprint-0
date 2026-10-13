@@ -3,10 +3,10 @@
 --
 -- Descripción:
 -- Pruebas sencillas de integración para comprobar
--- el funcionamiento de la tabla Medicion.
+-- el funcionamiento de la tabla MEDICIONES.
 --
--- Autor: Elia
--- Fecha: 08/10/2026
+-- Autor: Élia Garcia Pons
+-- Fecha: 13/10/2026
 --
 -- Copyright:
 -- Uso académico - Proyecto de Biometría y Medio Ambiente.
@@ -16,81 +16,76 @@
 -- ------------------------------------------------------------
 -- TEST 1
 --
--- Insertar una primera medición.
+-- Insertar una medición.
 --
--- id no se especifica porque debe generarse automáticamente.
+-- valor = Minor
+-- identificador_sensor = UUID
+-- tipo = parte de tipo extraída del Major
 -- ------------------------------------------------------------
 
-INSERT INTO Medicion (
-    uuid,
-    fecha,
-    major,
-    minor,
-    TxPower
+INSERT INTO MEDICIONES (
+    valor,
+    fecha_hora,
+    identificador_sensor,
+    tipo
 )
 VALUES (
-    '45505347-2D47-5449-2D50-524F592D3341',
-    '2026-10-08 16:00:00',
-    2821,
     1234,
-    -53
+    '2026-10-13 17:00:00',
+    '45505347-2D47-5449-2D50-524F592D3341',
+    11
 );
 
 
 -- ------------------------------------------------------------
 -- TEST 2
 --
--- Recuperar la medición insertada y comprobar que
--- existe un id generado automáticamente.
+-- Recuperar la medición insertada.
 -- ------------------------------------------------------------
 
 SELECT
-    id,
-    uuid,
-    fecha,
-    major,
-    minor,
-    TxPower
-FROM Medicion
-ORDER BY id DESC
-LIMIT 1;
+    valor,
+    fecha_hora,
+    identificador_sensor,
+    tipo
+FROM MEDICIONES
+WHERE
+    fecha_hora = '2026-10-13 17:00:00'
+    AND identificador_sensor =
+        '45505347-2D47-5449-2D50-524F592D3341';
 
 
 -- ------------------------------------------------------------
 -- TEST 3
 --
--- Insertar una segunda medición para comprobar
--- que AUTO_INCREMENT continúa funcionando.
+-- Insertar una segunda medición del mismo sensor,
+-- pero en una fecha/hora diferente.
 -- ------------------------------------------------------------
 
-INSERT INTO Medicion (
-    uuid,
-    fecha,
-    major,
-    minor,
-    TxPower
+INSERT INTO MEDICIONES (
+    valor,
+    fecha_hora,
+    identificador_sensor,
+    tipo
 )
 VALUES (
-    '45505347-2D47-5449-2D50-524F592D3341',
-    '2026-10-08 16:01:00',
-    2822,
     1234,
-    -53
+    '2026-10-13 17:00:05',
+    '45505347-2D47-5449-2D50-524F592D3341',
+    11
 );
 
 
 -- ------------------------------------------------------------
 -- TEST 4
 --
--- Recuperar todas las mediciones almacenadas.
+-- Recuperar todas las mediciones ordenadas por fecha/hora.
 -- ------------------------------------------------------------
 
 SELECT
-    id,
-    uuid,
-    fecha,
-    major,
-    minor,
-    TxPower
-FROM Medicion
-ORDER BY id ASC;
+    valor,
+    fecha_hora,
+    identificador_sensor,
+    tipo
+FROM MEDICIONES
+ORDER BY fecha_hora ASC;
