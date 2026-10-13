@@ -6,18 +6,13 @@
 // Descripción:
 // Implementa el componente de comunicación REST del Sprint 0.
 //
-// Recibe peticiones HTTP ya separadas en método, ruta y cuerpo,
-// transforma los datos recibidos y delega las operaciones en
-// el componente business_logic.
+// Recibe peticiones HTTP, transforma los datos recibidos
+// y delega las operaciones en business_logic.
 //
 // Este componente no accede directamente a la base de datos.
 //
-// Autor: Elia
-// Fecha: 08/10/2026
-//
-// Aportación:
-// Adaptación del servidor REST para mantener una separación
-// completa entre communication y business_logic.
+// Autor: Élia Garcia Pons
+// Fecha: 13/10/2026
 //
 // Copyright:
 // Uso académico - Proyecto de Biometría y Medio Ambiente.
@@ -33,12 +28,14 @@ class ServidorREST
     // logica: LogicaNegocio --> ServidorREST() -->
     // ------------------------------------------------------------
     //
-    // Recibe una referencia al componente business_logic
-    // que será utilizado para almacenar y recuperar mediciones.
+    // Recibe una referencia al componente business_logic.
     // ------------------------------------------------------------
-    public function __construct(object $logica)
-    {
-        $this->logica = $logica;
+    public function __construct(
+        object $logica
+    ) {
+
+        $this->logica =
+            $logica;
     }
 
 
@@ -50,8 +47,7 @@ class ServidorREST
     // --> respuesta: RespuestaREST
     // ------------------------------------------------------------
     //
-    // Determina qué operación REST debe ejecutarse según
-    // el método HTTP y la ruta recibidos.
+    // Determina qué operación REST debe ejecutarse.
     //
     // Rutas disponibles:
     //
@@ -86,12 +82,14 @@ class ServidorREST
         }
 
 
-        $json = json_encode(
-            [
-                "error" => "Ruta no encontrada"
-            ],
-            JSON_UNESCAPED_UNICODE
-        );
+        $json =
+            json_encode(
+                [
+                    "error" =>
+                        "Ruta no encontrada"
+                ],
+                JSON_UNESCAPED_UNICODE
+            );
 
 
         return $this->crearRespuesta(
@@ -109,29 +107,40 @@ class ServidorREST
     //
     // Convierte el JSON recibido en una Medicion.
     //
-    // Comprueba que existan los campos necesarios y delega
-    // el almacenamiento en business_logic.leerDatos().
+    // Comprueba que existan:
+    // - valor
+    // - fecha_hora
+    // - identificador_sensor
+    // - tipo
+    //
+    // Después delega el almacenamiento en:
+    //
+    // business_logic.leerDatos()
     // ------------------------------------------------------------
     private function postMedicion(
         string $json
     ): array {
 
         $medicion =
-            json_decode($json);
+            json_decode(
+                $json
+            );
 
 
         // --------------------------------------------------------
-        // Comprobar que el JSON recibido representa un objeto.
+        // Comprobar que el JSON representa un objeto.
         // --------------------------------------------------------
 
         if (!is_object($medicion)) {
 
-            $respuestaJson = json_encode(
-                [
-                    "error" => "JSON incorrecto"
-                ],
-                JSON_UNESCAPED_UNICODE
-            );
+            $respuestaJson =
+                json_encode(
+                    [
+                        "error" =>
+                            "JSON incorrecto"
+                    ],
+                    JSON_UNESCAPED_UNICODE
+                );
 
 
             return $this->crearRespuesta(
@@ -143,27 +152,27 @@ class ServidorREST
 
         // --------------------------------------------------------
         // Comprobar que existen todos los campos necesarios
-        // para construir una Medicion.
+        // de una Medicion.
         // --------------------------------------------------------
 
         if (
-            !isset($medicion->uuid)
+            !isset($medicion->valor)
             ||
-            !isset($medicion->fecha)
+            !isset($medicion->fecha_hora)
             ||
-            !isset($medicion->major)
+            !isset($medicion->identificador_sensor)
             ||
-            !isset($medicion->minor)
-            ||
-            !isset($medicion->TxPower)
+            !isset($medicion->tipo)
         ) {
 
-            $respuestaJson = json_encode(
-                [
-                    "error" => "Medicion incorrecta"
-                ],
-                JSON_UNESCAPED_UNICODE
-            );
+            $respuestaJson =
+                json_encode(
+                    [
+                        "error" =>
+                            "Medicion incorrecta"
+                    ],
+                    JSON_UNESCAPED_UNICODE
+                );
 
 
             return $this->crearRespuesta(
@@ -174,7 +183,8 @@ class ServidorREST
 
 
         // --------------------------------------------------------
-        // communication no guarda directamente la medición.
+        // El componente communication no almacena directamente
+        // la Medicion.
         //
         // La operación se delega en business_logic.
         // --------------------------------------------------------
@@ -187,13 +197,14 @@ class ServidorREST
 
         if (!$resultado) {
 
-            $respuestaJson = json_encode(
-                [
-                    "error" =>
-                        "No se pudo guardar la Medicion"
-                ],
-                JSON_UNESCAPED_UNICODE
-            );
+            $respuestaJson =
+                json_encode(
+                    [
+                        "error" =>
+                            "No se pudo guardar la Medicion"
+                    ],
+                    JSON_UNESCAPED_UNICODE
+                );
 
 
             return $this->crearRespuesta(
@@ -203,13 +214,14 @@ class ServidorREST
         }
 
 
-        $respuestaJson = json_encode(
-            [
-                "resultado" =>
-                    "Medicion almacenada"
-            ],
-            JSON_UNESCAPED_UNICODE
-        );
+        $respuestaJson =
+            json_encode(
+                [
+                    "resultado" =>
+                        "Medicion almacenada"
+                ],
+                JSON_UNESCAPED_UNICODE
+            );
 
 
         return $this->crearRespuesta(
@@ -224,26 +236,27 @@ class ServidorREST
     // --> respuesta: RespuestaREST
     // ------------------------------------------------------------
     //
-    // Solicita al componente business_logic la última
-    // medición almacenada.
+    // Solicita a business_logic la última Medicion.
     //
     // Si existe, la convierte a JSON.
     // ------------------------------------------------------------
     private function getMedicion(): array
     {
+
         $medicion =
             $this->logica->mostrarDatos();
 
 
         if ($medicion === null) {
 
-            $respuestaJson = json_encode(
-                [
-                    "error" =>
-                        "No hay mediciones"
-                ],
-                JSON_UNESCAPED_UNICODE
-            );
+            $respuestaJson =
+                json_encode(
+                    [
+                        "error" =>
+                            "No hay mediciones"
+                    ],
+                    JSON_UNESCAPED_UNICODE
+                );
 
 
             return $this->crearRespuesta(
@@ -253,10 +266,11 @@ class ServidorREST
         }
 
 
-        $respuestaJson = json_encode(
-            $medicion,
-            JSON_UNESCAPED_UNICODE
-        );
+        $respuestaJson =
+            json_encode(
+                $medicion,
+                JSON_UNESCAPED_UNICODE
+            );
 
 
         return $this->crearRespuesta(
@@ -282,8 +296,11 @@ class ServidorREST
     ): array {
 
         return [
-            "codigo" => $codigo,
-            "json" => $json
+            "codigo" =>
+                $codigo,
+
+            "json" =>
+                $json
         ];
     }
 }
