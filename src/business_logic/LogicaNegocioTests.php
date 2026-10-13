@@ -6,19 +6,13 @@
 // Descripción:
 // Pruebas automatizadas del componente business_logic.
 //
-// Comprueba los métodos principales de la lógica de negocio:
-// - leerDatos()
-// - mostrarDatos()
+// Comprueba:
+// - almacenamiento de una Medicion mediante leerDatos();
+// - recuperación mediante mostrarDatos();
+// - correspondencia con el nuevo modelo de MEDICIONES.
 //
-// Las pruebas trabajan directamente con objetos de dominio
-// Medicion, sin utilizar JSON ni mecanismos de comunicación.
-//
-// Autor: Elia
-// Fecha: 08/10/2026
-//
-// Aportación:
-// Pruebas de integración de la lógica de negocio con
-// la base de datos.
+// Autor: Élia Garcia Pons
+// Fecha: 13/10/2026
 //
 // Copyright:
 // Uso académico - Proyecto de Biometría y Medio Ambiente.
@@ -29,7 +23,7 @@ require_once __DIR__ . "/LogicaNegocio.php";
 
 
 // ------------------------------------------------------------
-// Configuración de conexión a la base de datos de pruebas.
+// Configuración de la base de datos de pruebas.
 // ------------------------------------------------------------
 
 $host =
@@ -46,13 +40,14 @@ $contrasenya =
 
 
 // ------------------------------------------------------------
-// condicion: B, mensaje: Text --> comprobar() -->
+// condicion: B,
+// mensaje: Text
+// --> comprobar() -->
 // ------------------------------------------------------------
 //
-// Comprueba el resultado de una prueba.
+// Comprueba el resultado de un test.
 //
-// Si la condición es verdadera muestra un mensaje OK.
-// Si es falsa lanza una excepción y detiene los tests.
+// Si la condición es falsa lanza una excepción.
 // ------------------------------------------------------------
 function comprobar(
     bool $condicion,
@@ -76,7 +71,7 @@ function comprobar(
 
 
 // ------------------------------------------------------------
-// Crear la conexión con la base de datos.
+// Crear conexión con la base de datos.
 // ------------------------------------------------------------
 
 $conexion =
@@ -106,36 +101,55 @@ $logica =
 // ------------------------------------------------------------
 // Crear una Medicion de prueba.
 //
-// Se crea directamente como objeto de dominio.
-// No se utiliza JSON porque pertenece a la capa
-// de comunicación y no a business_logic.
+// Se utiliza una fecha futura únicamente para garantizar
+// que mostrarDatos() la recupere como última medición.
 // ------------------------------------------------------------
 
 $medicion =
     new stdClass();
 
 
-$medicion->uuid =
-    "45505347-2D47-5449-2D50-524F592D3341";
-
-$medicion->fecha =
-    "2026-10-08 15:00:00";
-
-$medicion->major =
-    2821;
-
-$medicion->minor =
+$medicion->valor =
     1234;
 
-$medicion->TxPower =
-    -53;
+$medicion->fecha_hora =
+    "2099-12-31 23:59:59";
+
+$medicion->identificador_sensor =
+    "00000000-0000-0000-0000-000000000001";
+
+$medicion->tipo =
+    11;
 
 
 // ------------------------------------------------------------
+// Limpiar una posible ejecución anterior del mismo test.
+// ------------------------------------------------------------
+
+$consultaLimpieza =
+    $conexion->prepare(
+        "
+        DELETE FROM MEDICIONES
+        WHERE fecha_hora = :fecha_hora
+        AND identificador_sensor = :identificador_sensor
+        "
+    );
+
+
+$consultaLimpieza->execute([
+    ':fecha_hora' =>
+        $medicion->fecha_hora,
+
+    ':identificador_sensor' =>
+        $medicion->identificador_sensor
+]);
+
+
+// ============================================================
 // TEST 1
 //
-// Comprueba que la medición de prueba es un objeto.
-// ------------------------------------------------------------
+// Comprobar que la Medicion de prueba es un objeto.
+// ============================================================
 
 comprobar(
     is_object($medicion),
@@ -143,14 +157,15 @@ comprobar(
 );
 
 
-// ------------------------------------------------------------
+// ============================================================
 // TEST 2
 //
-// medicion: Medicion --> leerDatos() --> resultado: B
+// medicion: Medicion
+// --> leerDatos()
+// --> resultado: B
 //
-// Comprueba que leerDatos() almacena correctamente
-// la medición en la base de datos.
-// ------------------------------------------------------------
+// Comprobar que la medición se almacena correctamente.
+// ============================================================
 
 $resultado =
     $logica->leerDatos(
@@ -164,13 +179,14 @@ comprobar(
 );
 
 
-// ------------------------------------------------------------
+// ============================================================
 // TEST 3
 //
-// mostrarDatos() --> medicion: MedicionAlmacenada
+// mostrarDatos()
+// --> medicion: Medicion
 //
-// Comprueba que mostrarDatos() devuelve una medición.
-// ------------------------------------------------------------
+// Comprobar que se recupera una medición.
+// ============================================================
 
 $medicionRecuperada =
     $logica->mostrarDatos();
@@ -180,114 +196,86 @@ comprobar(
     is_object(
         $medicionRecuperada
     ),
-    "mostrarDatos() devuelve una Medicion almacenada"
+    "mostrarDatos() devuelve una Medicion"
 );
 
 
-// ------------------------------------------------------------
+// ============================================================
 // TEST 4
 //
-// Comprueba que la medición recuperada contiene
-// un identificador generado por la base de datos.
-// ------------------------------------------------------------
+// Comprobar valor.
+// ============================================================
 
 comprobar(
-    isset(
-        $medicionRecuperada->id
-    )
-    &&
-    (int) $medicionRecuperada->id > 0,
+    (int) $medicionRecuperada->valor
+        ===
+    $medicion->valor,
 
-    "La Medicion recuperada contiene un id valido"
+    "Valor correcto"
 );
 
 
-// ------------------------------------------------------------
+// ============================================================
 // TEST 5
 //
-// Comprueba que el UUID recuperado coincide con
-// el UUID almacenado.
-// ------------------------------------------------------------
+// Comprobar fecha_hora.
+// ============================================================
 
 comprobar(
-    $medicionRecuperada->uuid
+    $medicionRecuperada->fecha_hora
         ===
-    $medicion->uuid,
+    $medicion->fecha_hora,
 
-    "UUID correcto"
+    "Fecha y hora correctas"
 );
 
 
-// ------------------------------------------------------------
+// ============================================================
 // TEST 6
 //
-// Comprueba que la fecha recuperada coincide con
-// la fecha almacenada.
-// ------------------------------------------------------------
+// Comprobar identificador_sensor.
+// ============================================================
 
 comprobar(
-    $medicionRecuperada->fecha
+    $medicionRecuperada->identificador_sensor
         ===
-    $medicion->fecha,
+    $medicion->identificador_sensor,
 
-    "Fecha correcta"
+    "Identificador del sensor correcto"
 );
 
 
-// ------------------------------------------------------------
+// ============================================================
 // TEST 7
 //
-// Comprueba que el Major recuperado coincide con
-// el Major almacenado.
-// ------------------------------------------------------------
+// Comprobar tipo.
+// ============================================================
 
 comprobar(
-    (int) $medicionRecuperada->major
+    (int) $medicionRecuperada->tipo
         ===
-    $medicion->major,
+    $medicion->tipo,
 
-    "Major correcto"
+    "Tipo correcto"
 );
 
 
 // ------------------------------------------------------------
-// TEST 8
-//
-// Comprueba que el Minor recuperado coincide con
-// el Minor almacenado.
+// Limpiar la medición utilizada por los tests.
 // ------------------------------------------------------------
 
-comprobar(
-    (int) $medicionRecuperada->minor
-        ===
-    $medicion->minor,
+$consultaLimpieza->execute([
+    ':fecha_hora' =>
+        $medicion->fecha_hora,
 
-    "Minor correcto"
-);
+    ':identificador_sensor' =>
+        $medicion->identificador_sensor
+]);
 
-
-// ------------------------------------------------------------
-// TEST 9
-//
-// Comprueba que TxPower recuperado coincide con
-// el valor almacenado.
-// ------------------------------------------------------------
-
-comprobar(
-    (int) $medicionRecuperada->TxPower
-        ===
-    $medicion->TxPower,
-
-    "TxPower correcto"
-);
-
-
-// ------------------------------------------------------------
-// Resultado final de las pruebas.
-// ------------------------------------------------------------
 
 echo PHP_EOL;
 
 echo
-    "TODOS LOS TESTS HAN FINALIZADO CORRECTAMENTE."
+    "TODOS LOS TESTS DE BUSINESS_LOGIC "
+    . "HAN FINALIZADO CORRECTAMENTE."
     . PHP_EOL;

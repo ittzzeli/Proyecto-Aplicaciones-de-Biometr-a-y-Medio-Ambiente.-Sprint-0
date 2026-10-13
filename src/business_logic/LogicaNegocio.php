@@ -7,17 +7,18 @@
 // Implementa la lógica de negocio encargada de almacenar
 // y recuperar mediciones.
 //
+// Trabaja con el modelo lógico:
+// - valor
+// - fecha_hora
+// - identificador_sensor
+// - tipo
+//
 // Este componente es independiente de la capa de comunicación.
 // No contiene rutas, peticiones HTTP, respuestas HTTP,
 // códigos de estado ni formatos de transporte.
 //
-// Autor: Elia
-// Fecha: 08/10/2026
-//
-// Aportación:
-// Adaptación de la lógica de negocio del Sprint 0 para
-// mantener una separación completa respecto a la capa
-// de comunicación.
+// Autor: Élia Garcia Pons
+// Fecha: 13/10/2026
 //
 // Copyright:
 // Uso académico - Proyecto de Biometría y Medio Ambiente.
@@ -33,100 +34,113 @@ class LogicaNegocio
     // conexion: ConexionBD --> LogicaNegocio() -->
     // ------------------------------------------------------------
     //
-    // Recibe una conexión ya creada con la base de datos
-    // y la almacena para utilizarla en las operaciones
-    // de persistencia.
+    // Recibe una conexión ya creada con la base de datos.
     // ------------------------------------------------------------
-    public function __construct(PDO $conexion)
-    {
-        $this->conexion = $conexion;
+    public function __construct(
+        PDO $conexion
+    ) {
+
+        $this->conexion =
+            $conexion;
     }
 
 
     // ------------------------------------------------------------
-    // medicion: Medicion --> leerDatos() --> resultado: B
+    // medicion: Medicion
+    // --> leerDatos()
+    // --> resultado: B
     // ------------------------------------------------------------
     //
-    // Guarda una medición en la tabla Medicion.
+    // Guarda una Medicion en la tabla MEDICIONES.
     //
-    // La medición contiene:
-    // uuid, fecha, major, minor y TxPower.
+    // Campos:
+    // - valor
+    // - fecha_hora
+    // - identificador_sensor
+    // - tipo
     // ------------------------------------------------------------
-    public function leerDatos(object $medicion): bool
-    {
+    public function leerDatos(
+        object $medicion
+    ): bool {
+
         $sql = "
-            INSERT INTO Medicion (
-                uuid,
-                fecha,
-                major,
-                minor,
-                TxPower
+            INSERT INTO MEDICIONES (
+                valor,
+                fecha_hora,
+                identificador_sensor,
+                tipo
             )
             VALUES (
-                :uuid,
-                :fecha,
-                :major,
-                :minor,
-                :TxPower
+                :valor,
+                :fecha_hora,
+                :identificador_sensor,
+                :tipo
             )
         ";
 
+
         $consulta =
-            $this->conexion->prepare($sql);
+            $this->conexion->prepare(
+                $sql
+            );
+
 
         return $consulta->execute([
-            ':uuid' =>
-                $medicion->uuid,
+            ':valor' =>
+                $medicion->valor,
 
-            ':fecha' =>
-                $medicion->fecha,
+            ':fecha_hora' =>
+                $medicion->fecha_hora,
 
-            ':major' =>
-                $medicion->major,
+            ':identificador_sensor' =>
+                $medicion->identificador_sensor,
 
-            ':minor' =>
-                $medicion->minor,
-
-            ':TxPower' =>
-                $medicion->TxPower
+            ':tipo' =>
+                $medicion->tipo
         ]);
     }
 
 
     // ------------------------------------------------------------
-    // mostrarDatos() --> medicion: MedicionAlmacenada
+    // mostrarDatos()
+    // --> medicion: Medicion
     // ------------------------------------------------------------
     //
-    // Recupera la última medición almacenada.
+    // Recupera la última Medicion almacenada.
     //
-    // La medición recuperada incluye el id generado por
-    // la base de datos.
+    // La última medición se determina mediante fecha_hora.
     //
     // Si no existen mediciones devuelve null.
     // ------------------------------------------------------------
     public function mostrarDatos(): ?object
     {
+
         $sql = "
             SELECT
-                id,
-                uuid,
-                fecha,
-                major,
-                minor,
-                TxPower
-            FROM Medicion
-            ORDER BY id DESC
+                valor,
+                fecha_hora,
+                identificador_sensor,
+                tipo
+            FROM MEDICIONES
+            ORDER BY fecha_hora DESC
             LIMIT 1
         ";
 
+
         $consulta =
-            $this->conexion->query($sql);
+            $this->conexion->query(
+                $sql
+            );
+
 
         $medicion =
-            $consulta->fetch(PDO::FETCH_OBJ);
+            $consulta->fetch(
+                PDO::FETCH_OBJ
+            );
 
 
         if ($medicion === false) {
+
             return null;
         }
 
