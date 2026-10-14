@@ -14,7 +14,7 @@ package com.example.biometriasprint0;
 // - error de comunicación.
 //
 // Autor: Élia Garcia Pons
-// Fecha: 12/10/2026
+// Fecha: 13/10/2026
 //
 // Copyright:
 // Uso académico - Proyecto de Biometría y Medio Ambiente.
@@ -119,11 +119,10 @@ public class LogicaFakeTelefonoTest {
     private Medicion crearMedicionPrueba() {
 
         return new Medicion(
-                "45505347-2D47-5449-2D50-524F592D3341",
-                "2026-10-12 20:00:00",
-                2821,
                 1234,
-                -53
+                "2026-10-13 17:00:00",
+                "45505347-2D47-5449-2D50-524F592D3341",
+                11
         );
     }
 
@@ -160,11 +159,10 @@ public class LogicaFakeTelefonoTest {
 
         assertEquals(
                 "{"
-                        + "\"uuid\":\"45505347-2D47-5449-2D50-524F592D3341\","
-                        + "\"fecha\":\"2026-10-12 20:00:00\","
-                        + "\"major\":2821,"
-                        + "\"minor\":1234,"
-                        + "\"TxPower\":-53"
+                        + "\"valor\":1234,"
+                        + "\"fecha_hora\":\"2026-10-13 17:00:00\","
+                        + "\"identificador_sensor\":\"45505347-2D47-5449-2D50-524F592D3341\","
+                        + "\"tipo\":11"
                         + "}",
                 json
         );
@@ -223,11 +221,10 @@ public class LogicaFakeTelefonoTest {
 
         assertEquals(
                 "{"
-                        + "\"uuid\":\"45505347-2D47-5449-2D50-524F592D3341\","
-                        + "\"fecha\":\"2026-10-12 20:00:00\","
-                        + "\"major\":2821,"
-                        + "\"minor\":1234,"
-                        + "\"TxPower\":-53"
+                        + "\"valor\":1234,"
+                        + "\"fecha_hora\":\"2026-10-13 17:00:00\","
+                        + "\"identificador_sensor\":\"45505347-2D47-5449-2D50-524F592D3341\","
+                        + "\"tipo\":11"
                         + "}",
                 peticionario.ultimoCuerpo
         );

@@ -14,7 +14,7 @@ package com.example.biometriasprint0;
 // ruta REST utilizada para almacenar mediciones.
 //
 // Autor: Élia Garcia Pons
-// Fecha: 12/10/2026
+// Fecha: 13/10/2026
 //
 // Copyright:
 // Uso académico - Proyecto de Biometría y Medio Ambiente.
@@ -125,39 +125,34 @@ public class LogicaFakeTelefono {
     // esperada por el backend.
     //
     // Campos:
-    // - uuid
-    // - fecha
-    // - major
-    // - minor
-    // - TxPower
+    // - valor
+    // - fecha_hora
+    // - identificador_sensor
+    // - tipo
     // ------------------------------------------------------------
     String crearJson(
             Medicion medicion
     ) {
 
         return "{"
-                + "\"uuid\":\""
-                + escaparTextoJson(
-                medicion.getUuid()
-        )
-                + "\","
-
-                + "\"fecha\":\""
-                + escaparTextoJson(
-                medicion.getFecha()
-        )
-                + "\","
-
-                + "\"major\":"
-                + medicion.getMajor()
+                + "\"valor\":"
+                + medicion.getValor()
                 + ","
 
-                + "\"minor\":"
-                + medicion.getMinor()
-                + ","
+                + "\"fecha_hora\":\""
+                + escaparTextoJson(
+                        medicion.getFechaHora()
+                )
+                + "\","
 
-                + "\"TxPower\":"
-                + medicion.getTxPower()
+                + "\"identificador_sensor\":\""
+                + escaparTextoJson(
+                        medicion.getIdentificadorSensor()
+                )
+                + "\","
+
+                + "\"tipo\":"
+                + medicion.getTipo()
 
                 + "}";
     }

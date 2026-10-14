@@ -30,17 +30,17 @@
         app:layout_constraintEnd_toEndOf="parent" />
 
 
-    <!-- Busca todos los dispositivos BLE cercanos. -->
+    <!-- Busca únicamente nuestro beacon Elia_GTI. -->
 
     <Button
-        android:id="@+id/botonBuscarTodos"
+        android:id="@+id/botonBuscarEliaGTI"
 
         android:layout_width="0dp"
         android:layout_height="wrap_content"
 
-        android:layout_marginTop="40dp"
+        android:layout_marginTop="24dp"
 
-        android:text="Buscar todos los dispositivos BTLE"
+        android:text="Buscar Elia_GTI"
 
         app:layout_constraintTop_toBottomOf="@id/textoTitulo"
         app:layout_constraintStart_toStartOf="parent"
@@ -59,32 +59,12 @@
 
         android:text="Detener búsqueda"
 
-        app:layout_constraintTop_toBottomOf="@id/botonBuscarTodos"
+        app:layout_constraintTop_toBottomOf="@id/botonBuscarEliaGTI"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent" />
 
 
-    <!-- Busca únicamente nuestro beacon "Elia_GTI". -->
-
-    <Button
-        android:id="@+id/botonBuscarEliaGTI"
-
-        android:layout_width="0dp"
-        android:layout_height="wrap_content"
-
-        android:layout_marginTop="16dp"
-
-        android:text="Buscar Elia_GTI"
-
-        app:layout_constraintTop_toBottomOf="@id/botonDetenerBusqueda"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintEnd_toEndOf="parent" />
-
-
-    <!--
-         Zona de información.
-         Aquí mostraremos posteriormente el beacon detectado.
-          -->
+    <!-- Zona en la que se muestra el estado de la aplicación. -->
 
     <TextView
         android:id="@+id/textoEstado"
@@ -97,7 +77,7 @@
         android:text="Esperando búsqueda..."
         android:textSize="16sp"
 
-        app:layout_constraintTop_toBottomOf="@id/botonBuscarEliaGTI"
+        app:layout_constraintTop_toBottomOf="@id/botonDetenerBusqueda"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent" />
 

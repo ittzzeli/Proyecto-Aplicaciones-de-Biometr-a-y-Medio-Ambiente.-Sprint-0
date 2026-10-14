@@ -4,17 +4,22 @@ package com.example.biometriasprint0;
 // Archivo: Medicion.java
 //
 // Descripción:
-// Representa una medición obtenida a partir de una trama
-// iBeacon.
+// Representa una medición preparada para ser enviada
+// al backend.
 //
-// Contiene los datos que posteriormente serán entregados a
-// LogicaFakeTelefono para enviarlos al backend.
+// Contiene únicamente los datos que utiliza el modelo
+// de negocio:
+//
+// - valor
+// - fecha_hora
+// - identificador_sensor
+// - tipo
 //
 // Esta clase no contiene código BLE, HTTP ni acceso a la
 // base de datos.
 //
 // Autor: Élia Garcia Pons
-// Fecha: 08/10/2026
+// Fecha: 13/10/2026
 //
 // Copyright:
 // Uso académico - Proyecto de Biometría y Medio Ambiente.
@@ -22,75 +27,65 @@ package com.example.biometriasprint0;
 
 public class Medicion {
 
-    private final String uuid;
-    private final String fecha;
-    private final int major;
-    private final int minor;
-    private final int txPower;
+    private final int valor;
+    private final String fechaHora;
+    private final String identificadorSensor;
+    private final int tipo;
 
 
     // ------------------------------------------------------------
-    // uuid: Text,
-    // fecha: Text,
-    // major: Z,
-    // minor: Z,
-    // TxPower: Z
+    // valor: Z,
+    // fecha_hora: Text,
+    // identificador_sensor: Text,
+    // tipo: Z
     // --> Medicion() -->
     // ------------------------------------------------------------
     //
-    // Crea una medición con los datos obtenidos del iBeacon.
+    // Crea una medición con los datos preparados para
+    // ser enviados al backend.
     // ------------------------------------------------------------
     public Medicion(
-            String uuid,
-            String fecha,
-            int major,
-            int minor,
-            int txPower
+            int valor,
+            String fechaHora,
+            String identificadorSensor,
+            int tipo
     ) {
-        this.uuid = uuid;
-        this.fecha = fecha;
-        this.major = major;
-        this.minor = minor;
-        this.txPower = txPower;
+        this.valor = valor;
+        this.fechaHora = fechaHora;
+        this.identificadorSensor = identificadorSensor;
+        this.tipo = tipo;
     }
 
 
     // ------------------------------------------------------------
-    // getUuid() --> uuid: Text
+    // getValor() --> valor: Z
     // ------------------------------------------------------------
-    public String getUuid() {
-        return uuid;
+    public int getValor() {
+        return valor;
     }
 
 
     // ------------------------------------------------------------
-    // getFecha() --> fecha: Text
+    // getFechaHora() --> fecha_hora: Text
     // ------------------------------------------------------------
-    public String getFecha() {
-        return fecha;
+    public String getFechaHora() {
+        return fechaHora;
     }
 
 
     // ------------------------------------------------------------
-    // getMajor() --> major: Z
+    // getIdentificadorSensor()
+    // --> identificador_sensor: Text
     // ------------------------------------------------------------
-    public int getMajor() {
-        return major;
+    public String getIdentificadorSensor() {
+        return identificadorSensor;
     }
 
 
     // ------------------------------------------------------------
-    // getMinor() --> minor: Z
+    // getTipo() --> tipo: Z
     // ------------------------------------------------------------
-    public int getMinor() {
-        return minor;
-    }
-
-
-    // ------------------------------------------------------------
-    // getTxPower() --> TxPower: Z
-    // ------------------------------------------------------------
-    public int getTxPower() {
-        return txPower;
+    public int getTipo() {
+        return tipo;
     }
 }
