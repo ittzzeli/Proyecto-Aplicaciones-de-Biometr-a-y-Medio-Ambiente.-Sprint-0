@@ -21,7 +21,8 @@
 class LogicaFakeNavegador {
 
     // ------------------------------------------------------------
-    // servidor: Text
+    // servidor: Text,
+    // fetchImpl: Funcion
     // --> LogicaFakeNavegador() -->
     // ------------------------------------------------------------
     //
@@ -31,14 +32,30 @@ class LogicaFakeNavegador {
     // ------------------------------------------------------------
     constructor(
         servidor,
-        fetchImpl = fetch
+        fetchImpl = null
     ) {
 
         this.servidor =
             servidor;
 
-        this.fetchImpl =
-            fetchImpl;
+
+        if (fetchImpl !== null) {
+
+            this.fetchImpl =
+                fetchImpl;
+
+        } else {
+
+            this.fetchImpl =
+                (
+                    url,
+                    opciones
+                ) =>
+                    fetch(
+                        url,
+                        opciones
+                    );
+        }
     }
 
 
@@ -66,10 +83,12 @@ class LogicaFakeNavegador {
             await this.fetchImpl(
                 this.servidor + "/medicion",
                 {
-                    method: "GET",
+                    method:
+                        "GET",
 
                     headers: {
-                        "Accept": "application/json"
+                        "Accept":
+                            "application/json"
                     }
                 }
             );

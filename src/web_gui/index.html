@@ -9,7 +9,9 @@
         content="width=device-width, initial-scale=1.0"
     >
 
-    <title>Mediciones</title>
+    <title>
+        Biometría - Sprint 0
+    </title>
 
     <link
         rel="stylesheet"
@@ -17,61 +19,76 @@
     >
 </head>
 
+
 <body>
 
-    <!--
-        Interfaz gráfica encargada de mostrar
-        la última medición disponible.
+    <main class="contenedor">
 
-        La GUI no realiza comunicaciones REST directamente.
-    -->
-    <main>
+        <h1>
+            Última medición
+        </h1>
+
 
         <section class="medicion">
 
-            <h1>Última medición</h1>
+            <p>
+                <strong>Valor:</strong>
+                <span id="valor">
+                    -
+                </span>
+            </p>
 
-            <div class="datos">
 
-                <span>Fecha</span>
-                <span id="fecha">--</span>
+            <p>
+                <strong>Fecha y hora:</strong>
+                <span id="fechaHora">
+                    -
+                </span>
+            </p>
 
-                <span>Major</span>
-                <span id="major">--</span>
 
-                <span>Minor</span>
-                <span id="minor">--</span>
+            <p>
+                <strong>Identificador del sensor:</strong>
+                <span id="identificadorSensor">
+                    -
+                </span>
+            </p>
 
-                <span>TxPower</span>
-                <span id="txPower">--</span>
 
-            </div>
-
-            <p
-                id="error"
-                hidden
-            >
+            <p>
+                <strong>Tipo:</strong>
+                <span id="tipo">
+                    -
+                </span>
             </p>
 
         </section>
+
+        <button id="botonActualizar" type="button"> Actualizar </button>
+
+        <p
+            id="error"
+            class="error"
+        ></p>
 
     </main>
 
 
     <!--
-        Primero se carga la lógica de negocio fake/proxy.
+        Lógica frontend.
 
-        Está situada en un componente diferente de la GUI.
+        Debe cargarse antes que app.js porque la interfaz
+        utiliza LogicaFakeNavegador.
     -->
     <script
-        src="../web_frontend_business_logic/LogicaFakeNavegador.js"
-    ></script>
+        src="../web_frontend_business_logic/LogicaFakeNavegador.js">
+    </script>
 
 
-    <!--
-        Después se carga la lógica propia de la interfaz.
-    -->
-    <script src="app.js"></script>
+    <!-- Interfaz gráfica. -->
+    <script
+        src="app.js">
+    </script>
 
 </body>
 

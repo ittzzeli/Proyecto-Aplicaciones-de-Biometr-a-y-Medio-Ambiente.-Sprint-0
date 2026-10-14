@@ -2,17 +2,18 @@
 // Archivo: WebTest.js
 //
 // Descripción:
-// Pruebas automatizadas de la interfaz gráfica web.
+// Pruebas automatizadas de la interfaz web.
 //
-// Comprueba que mostrarUltimaMedicion():
-// - solicita los datos mediante la lógica fake;
-// - muestra correctamente la medición;
-// - muestra un mensaje cuando ocurre un error.
-//
-// Estas pruebas no realizan peticiones HTTP.
+// Comprueba:
+// - que mostrarUltimaMedicion() solicita los datos;
+// - que muestra valor;
+// - que muestra fecha_hora;
+// - que muestra identificador_sensor;
+// - que muestra tipo;
+// - que muestra un mensaje si ocurre un error.
 //
 // Autor: Élia Garcia Pons
-// Fecha: 13/10/2026
+// Fecha: 14/10/2026
 //
 // Copyright:
 // Uso académico - Proyecto de Biometría y Medio Ambiente.
@@ -21,16 +22,14 @@
 
 const {
     mostrarUltimaMedicion
-} = require("./app.js");
+} =
+    require("./app.js");
 
 
 // ------------------------------------------------------------
 // condicion: B,
 // mensaje: Text
 // --> comprobar() -->
-// ------------------------------------------------------------
-//
-// Comprueba el resultado de un test.
 // ------------------------------------------------------------
 function comprobar(
     condicion,
@@ -41,78 +40,60 @@ function comprobar(
 
         throw new Error(
             "TEST FALLIDO: "
-                + mensaje
+            + mensaje
         );
     }
 
 
     console.log(
         "OK - "
-            + mensaje
+        + mensaje
     );
 }
 
 
 // ------------------------------------------------------------
-// crearElemento() --> elemento: ElementoGUI
+// crearElementoFake()
+// --> elemento: ElementoGUI
 // ------------------------------------------------------------
 //
-// Crea un elemento HTML falso para probar la interfaz
-// sin necesitar un navegador real.
+// Crea un elemento sencillo con textContent para simular
+// un elemento HTML durante los tests.
 // ------------------------------------------------------------
-function crearElemento() {
+function crearElementoFake() {
 
     return {
-        textContent: "",
-        hidden: false
+        textContent: ""
     };
 }
 
 
 // ------------------------------------------------------------
-// ejecutarTests() -->
+// testMostrarMedicion() -->
 // ------------------------------------------------------------
 //
-// Ejecuta las pruebas automatizadas de la interfaz web.
+// Comprueba que los datos de una Medicion se muestran
+// correctamente en la interfaz.
 // ------------------------------------------------------------
-async function ejecutarTests() {
+async function testMostrarMedicion() {
 
-
-    // ========================================================
-    // PRUEBAS CON UNA MEDICION CORRECTA
-    // ========================================================
-
-
-    // --------------------------------------------------------
-    // mostrarDatos() --> medicion: MedicionAlmacenada
-    // --------------------------------------------------------
-    //
-    // Lógica fake controlada para probar exclusivamente
-    // la interfaz gráfica.
-    // --------------------------------------------------------
     const logicaFake = {
 
         async mostrarDatos() {
 
             return {
 
-                id:
-                    1,
-
-                uuid:
-                    "45505347-2D47-5449-2D50-524F592D3341",
-
-                fecha:
-                    "2026-10-13 10:00:00",
-
-                major:
-                    2821,
-
-                minor:
+                valor:
                     1234,
 
-                TxPower:
-                    -53
+                fecha_hora:
+                    "2026-10-14 09:06:41",
+
+                identificador_sensor:
+                    "45505347-2D47-5449-2D50-524F592D3341",
+
+                tipo:
+                    11
             };
         }
     };
@@ -120,20 +101,20 @@ async function ejecutarTests() {
 
     const elementos = {
 
-        fecha:
-            crearElemento(),
+        valor:
+            crearElementoFake(),
 
-        major:
-            crearElemento(),
+        fechaHora:
+            crearElementoFake(),
 
-        minor:
-            crearElemento(),
+        identificadorSensor:
+            crearElementoFake(),
 
-        txPower:
-            crearElemento(),
+        tipo:
+            crearElementoFake(),
 
         error:
-            crearElemento()
+            crearElementoFake()
     };
 
 
@@ -143,77 +124,62 @@ async function ejecutarTests() {
     );
 
 
-    // --------------------------------------------------------
-    // TEST 1
-    // --------------------------------------------------------
-
     comprobar(
-        elementos.fecha.textContent
-            ===
-        "2026-10-13 10:00:00",
-
-        "La Fecha se muestra correctamente"
-    );
-
-
-    // --------------------------------------------------------
-    // TEST 2
-    // --------------------------------------------------------
-
-    comprobar(
-        elementos.major.textContent
-            ===
-        2821,
-
-        "Major se muestra correctamente"
-    );
-
-
-    // --------------------------------------------------------
-    // TEST 3
-    // --------------------------------------------------------
-
-    comprobar(
-        elementos.minor.textContent
+        elementos.valor.textContent
             ===
         1234,
 
-        "Minor se muestra correctamente"
+        "La web muestra el valor"
     );
 
-
-    // --------------------------------------------------------
-    // TEST 4
-    // --------------------------------------------------------
 
     comprobar(
-        elementos.txPower.textContent
+        elementos.fechaHora.textContent
             ===
-        -53,
+        "2026-10-14 09:06:41",
 
-        "TxPower se muestra correctamente"
+        "La web muestra la fecha y hora"
     );
 
-
-    // --------------------------------------------------------
-    // TEST 5
-    // --------------------------------------------------------
 
     comprobar(
-        elementos.error.hidden
+        elementos.identificadorSensor.textContent
             ===
-        true,
+        "45505347-2D47-5449-2D50-524F592D3341",
 
-        "La interfaz muestra la Medicion sin errores"
+        "La web muestra el identificador del sensor"
     );
 
 
-    // ========================================================
-    // PRUEBA DE ERROR
-    // ========================================================
+    comprobar(
+        elementos.tipo.textContent
+            ===
+        11,
+
+        "La web muestra el tipo"
+    );
 
 
-    const logicaFakeError = {
+    comprobar(
+        elementos.error.textContent
+            ===
+        "",
+
+        "La web no muestra error si la medicion es correcta"
+    );
+}
+
+
+// ------------------------------------------------------------
+// testMostrarError() -->
+// ------------------------------------------------------------
+//
+// Comprueba que la interfaz informa cuando
+// LogicaFakeNavegador no puede recuperar la medición.
+// ------------------------------------------------------------
+async function testMostrarError() {
+
+    const logicaFake = {
 
         async mostrarDatos() {
 
@@ -224,68 +190,77 @@ async function ejecutarTests() {
     };
 
 
-    const elementosError = {
+    const elementos = {
 
-        fecha:
-            crearElemento(),
+        valor:
+            crearElementoFake(),
 
-        major:
-            crearElemento(),
+        fechaHora:
+            crearElementoFake(),
 
-        minor:
-            crearElemento(),
+        identificadorSensor:
+            crearElementoFake(),
 
-        txPower:
-            crearElemento(),
+        tipo:
+            crearElementoFake(),
 
         error:
-            crearElemento()
+            crearElementoFake()
     };
 
 
     await mostrarUltimaMedicion(
-        logicaFakeError,
-        elementosError
+        logicaFake,
+        elementos
     );
 
-
-    // --------------------------------------------------------
-    // TEST 6
-    // --------------------------------------------------------
 
     comprobar(
-        elementosError.error.hidden
+        elementos.error.textContent
             ===
-        false,
+        "No se ha podido recuperar la última medición.",
 
-        "La interfaz muestra el error cuando falla mostrarDatos()"
-    );
-
-
-    // --------------------------------------------------------
-    // TEST 7
-    // --------------------------------------------------------
-
-    comprobar(
-        elementosError.error.textContent
-            ===
-        "No se pudo obtener la última medición.",
-
-        "El mensaje de error es correcto"
-    );
-
-
-    console.log("");
-
-    console.log(
-        "TODOS LOS TESTS DE LA INTERFAZ WEB "
-            + "HAN FINALIZADO CORRECTAMENTE."
+        "La web muestra un mensaje de error"
     );
 }
 
 
 // ------------------------------------------------------------
-// Ejecutar las pruebas.
+// ejecutarTests() -->
+// ------------------------------------------------------------
+//
+// Ejecuta todas las pruebas de la interfaz web.
+// ------------------------------------------------------------
+async function ejecutarTests() {
+
+    await testMostrarMedicion();
+
+    await testMostrarError();
+
+
+    console.log("");
+
+    console.log(
+        "TODOS LOS TESTS DE WEB_GUI "
+        + "HAN FINALIZADO CORRECTAMENTE."
+    );
+}
+
+
+// ------------------------------------------------------------
+// Ejecutar tests.
 // ------------------------------------------------------------
 
-ejecutarTests();
+ejecutarTests()
+    .catch(
+        error => {
+
+            console.error(
+                error
+            );
+
+            process.exit(
+                1
+            );
+        }
+    );

@@ -2,15 +2,18 @@
 // Archivo: app.js
 //
 // Descripción:
-// Gestiona la interfaz gráfica de la aplicación web.
+// Gestiona la interfaz gráfica web del Sprint 0.
 //
-// Solicita la última medición exclusivamente mediante
-// LogicaFakeNavegador y muestra los datos obtenidos.
+// Solicita la última medición mediante
+// LogicaFakeNavegador y muestra sus datos en pantalla.
+//
+// El usuario puede solicitar una nueva actualización
+// mediante el botón Actualizar.
 //
 // Este archivo no realiza peticiones HTTP directamente.
 //
 // Autor: Élia Garcia Pons
-// Fecha: 13/10/2026
+// Fecha: 14/10/2026
 //
 // Copyright:
 // Uso académico - Proyecto de Biometría y Medio Ambiente.
@@ -23,10 +26,8 @@
 // --> mostrarUltimaMedicion() -->
 // ------------------------------------------------------------
 //
-// Solicita la última medición mediante la lógica fake
-// y coloca sus valores en la interfaz.
-//
-// Si ocurre un error, muestra un mensaje al usuario.
+// Solicita la última Medicion mediante la lógica frontend
+// y muestra sus datos en la interfaz.
 // ------------------------------------------------------------
 async function mostrarUltimaMedicion(
     logica,
@@ -39,101 +40,148 @@ async function mostrarUltimaMedicion(
             await logica.mostrarDatos();
 
 
-        elementos.fecha.textContent =
-            medicion.fecha;
-
-        elementos.major.textContent =
-            medicion.major;
-
-        elementos.minor.textContent =
-            medicion.minor;
-
-        elementos.txPower.textContent =
-            medicion.TxPower;
+        elementos.valor.textContent =
+            medicion.valor;
 
 
-        elementos.error.hidden =
-            true;
+        elementos.fechaHora.textContent =
+            medicion.fecha_hora;
+
+
+        elementos.identificadorSensor.textContent =
+            medicion.identificador_sensor;
+
+
+        elementos.tipo.textContent =
+            medicion.tipo;
+
+
+        elementos.error.textContent =
+            "";
 
     } catch (error) {
 
         elementos.error.textContent =
-            "No se pudo obtener la última medición.";
-
-        elementos.error.hidden =
-            false;
+            "No se ha podido recuperar la última medición.";
     }
 }
 
 
 // ------------------------------------------------------------
-// Inicialización de la interfaz.
+// iniciarInterfaz() -->
 // ------------------------------------------------------------
 //
-// Cuando el documento está preparado:
-// - crea la lógica fake;
-// - obtiene los elementos de la interfaz;
-// - solicita la última medición.
+// Obtiene los elementos HTML, crea LogicaFakeNavegador,
+// muestra la última medición y configura el botón Actualizar.
 // ------------------------------------------------------------
-if (typeof document !== "undefined") {
+function iniciarInterfaz() {
 
-    document.addEventListener(
-        "DOMContentLoaded",
-        async function () {
+    const elementos = {
 
-            // ----------------------------------------------------
-            // La GUI solo conoce LogicaFakeNavegador.
-            //
-            // Una dirección vacía indica que el backend se
-            // encuentra en el mismo servidor que la web.
-            // ----------------------------------------------------
+        valor:
+            document.getElementById(
+                "valor"
+            ),
 
-            const logica =
-                new LogicaFakeNavegador(
-                    ""
-                );
+        fechaHora:
+            document.getElementById(
+                "fechaHora"
+            ),
+
+        identificadorSensor:
+            document.getElementById(
+                "identificadorSensor"
+            ),
+
+        tipo:
+            document.getElementById(
+                "tipo"
+            ),
+
+        error:
+            document.getElementById(
+                "error"
+            )
+    };
 
 
-            const elementos = {
+    const botonActualizar =
+        document.getElementById(
+            "botonActualizar"
+        );
 
-                fecha:
-                    document.getElementById(
-                        "fecha"
-                    ),
 
-                major:
-                    document.getElementById(
-                        "major"
-                    ),
+    const logica =
+        new LogicaFakeNavegador(
+            ""
+        );
 
-                minor:
-                    document.getElementById(
-                        "minor"
-                    ),
 
-                txPower:
-                    document.getElementById(
-                        "txPower"
-                    ),
+    // --------------------------------------------------------
+    // Mostrar la última medición al abrir la página.
+    // --------------------------------------------------------
 
-                error:
-                    document.getElementById(
-                        "error"
-                    )
-            };
+    mostrarUltimaMedicion(
+        logica,
+        elementos
+    );
+
+
+    // --------------------------------------------------------
+    // Actualizar la medición cuando el usuario pulse
+    // el botón.
+    //
+    // Mientras se realiza la actualización, el botón queda
+    // desactivado para evitar varias peticiones simultáneas.
+    // --------------------------------------------------------
+
+    botonActualizar.addEventListener(
+        "click",
+        async () => {
+
+            botonActualizar.disabled =
+                true;
+
+
+            botonActualizar.textContent =
+                "Actualizando...";
 
 
             await mostrarUltimaMedicion(
                 logica,
                 elementos
             );
+
+
+            botonActualizar.disabled =
+                false;
+
+
+            botonActualizar.textContent =
+                "Actualizar";
         }
     );
 }
 
 
 // ------------------------------------------------------------
-// Exportación utilizada exclusivamente por los tests Node.js.
+// Iniciar la interfaz cuando el documento esté preparado.
+// ------------------------------------------------------------
+
+if (
+    typeof document !== "undefined"
+) {
+
+    document.addEventListener(
+        "DOMContentLoaded",
+        iniciarInterfaz
+    );
+}
+
+
+// ------------------------------------------------------------
+// Permitir utilizar mostrarUltimaMedicion() desde los tests
+// ejecutados con Node.
 // ------------------------------------------------------------
 
 if (

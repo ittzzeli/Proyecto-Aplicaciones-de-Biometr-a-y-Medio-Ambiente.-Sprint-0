@@ -1,180 +1,147 @@
 # Diseño del Componente
 
-El componente **web** muestra en el navegador la última medición disponible. La interfaz obtiene los datos exclusivamente mediante `LogicaFakeNavegador`; no accede directamente al servidor REST ni a la base de datos desde la capa de presentación.
-
-## Tipo de datos
-
-```text
-Medicion = (
-    uuid: Text,
-    fecha: Text,
-    major: Z,
-    minor: Z,
-    tx_power: Z
-)
-```
-
-En JSON, `tx_power` se representa con la clave `TxPower`.
-
-## Lógica fake del navegador
-
-```text
-                 -------- LogicaFakeNavegador --------
-                 |
-                 | servidor: Text
-                 |
-                 |
-servidor: Text --> LogicaFakeNavegador() -->
-                 |
-                 |
-medicion: Medicion <-- mostrarDatos() <--
-                 |
-                 ---------------------------------------
-```
-
-`mostrarDatos()` representa la operación homónima de la lógica de negocio desde el cliente. Para obtener la medición realiza `GET /medicion` y devuelve el JSON convertido en una `Medicion`.
-
-## Interfaz gráfica
-
-La pantalla contiene un único bloque titulado **“Última medición”** con los siguientes valores:
-
-```text
-Última medición
-+---------+-----------------------+
-| Fecha   | valor de fecha        |
-| Major   | valor de major        |
-| Minor   | valor de minor        |
-| TxPower | valor de TxPower      |
-+---------+-----------------------+
-```
-
-La función que actualiza la interfaz se diseña como:
-
-```text
-logica: LogicaFakeNavegador,
-interfaz: InterfazMedicion --> mostrarUltimaMedicion() -->
-```
-
-La interfaz se inicializa al cargar el documento y solicita la última medición a la lógica fake.
-
-# Aclaraciones del Diseño
-
-- La interfaz no muestra `id` ni `uuid`; esos datos pueden existir en la medición pero no forman parte del bloque visual solicitado.
-- `app.js` no realiza llamadas `fetch()` directas al REST; utiliza `LogicaFakeNavegador.mostrarDatos()`.
-- `LogicaFakeNavegador` utiliza `GET /medicion` para representar `mostrarDatos()` desde el cliente.
-- Si no se puede obtener una medición, la interfaz muestra un mensaje de error.
-- `WebTest.js` prueba la actualización de `Fecha`, `Major`, `Minor` y `TxPower` mediante una lógica fake controlada.
-- `LogicaFakeNavegadorTest.js` comprueba que la lógica fake utiliza `GET /medicion` y conserva los datos recibidos.
-
-# Reglas Generales
-
-- **Lenguaje de programación:** HTML5 para la estructura, CSS para la presentación y JavaScript para la lógica del navegador y las pruebas.
-- **Encabezados de funciones/métodos:** cada función o método JavaScript deberá incluir su diseño lógico dentro de un bloque de comentarios delimitado por líneas discontinuas (`--------------------`).
-- **Legibilidad del código:** la vista deberá permanecer separada de la comunicación REST; la obtención de datos se realizará a través de `LogicaFakeNavegador`.
-- **Pruebas automatizadas:** se deberán mantener pruebas para la lógica fake del navegador y para la representación de los datos en la interfaz.
-# Diseño del Componente
-
 El componente **web_gui** representa la interfaz gráfica web del Sprint 0.
 
-Su responsabilidad es mostrar al usuario la última medición disponible.
+Su función es mostrar al usuario la última medición almacenada en el sistema.
 
-La interfaz obtiene los datos exclusivamente mediante el componente `web_frontend_business_logic`.
+La interfaz gráfica no accede directamente a la base de datos ni realiza peticiones HTTP.
 
-`web_gui` no realiza directamente peticiones HTTP, no utiliza `fetch()` y no conoce las rutas REST del backend.
-
-## Tipos de datos
-
-```text
-MedicionAlmacenada = (
-    id: N,
-    uuid: Text,
-    fecha: Text,
-    major: Z,
-    minor: Z,
-    TxPower: Z
-)
-
-ElementosGUI = (
-    fecha,
-    major,
-    minor,
-    txPower,
-    error
-)
-
-LogicaFakeNavegador = componente web_frontend_business_logic
-```
-
-La interfaz recibe una `MedicionAlmacenada`, aunque durante el Sprint 0 únicamente muestra:
-
-```text
-fecha
-major
-minor
-TxPower
-```
-
-Los campos:
-
-```text
-id
-uuid
-```
-
-pueden estar presentes en la medición, pero no forman parte de la representación visual de esta pantalla.
-
-## Flujo general
-
-```text
-Usuario
-   |
-   v
-web_gui
-   |
-   | mostrarDatos()
-   v
-web_frontend_business_logic
-   |
-   v
-MedicionAlmacenada
-   |
-   v
-mostrarUltimaMedicion()
-   |
-   v
-Pantalla
-```
-
-La GUI solo utiliza:
+Para obtener la información utiliza:
 
 ```text
 LogicaFakeNavegador.mostrarDatos()
 ```
 
-A partir de esa operación obtiene una `MedicionAlmacenada` y actualiza los elementos visibles de la página.
+del componente:
 
-## Interfaz gráfica
+```text
+web_frontend_business_logic
+```
 
-La pantalla contiene un único bloque titulado:
+## Datos mostrados
+
+La página muestra la última `Medicion` almacenada.
+
+```text
+Medicion = (
+    valor: Z,
+    fecha_hora: Text,
+    identificador_sensor: Text,
+    tipo: Z
+)
+```
+
+Los campos mostrados son:
+
+```text
+valor
+fecha_hora
+identificador_sensor
+tipo
+```
+
+Ejemplo:
 
 ```text
 Última medición
+
+Valor:
+1234
+
+Fecha y hora:
+2026-10-14 09:36:35
+
+Identificador del sensor:
+45505347-2D47-5449-2D50-524F592D3341
+
+Tipo:
+11
+
+[ Actualizar ]
 ```
 
-con la siguiente información:
+## Flujo de la interfaz
+
+Al abrir la página:
 
 ```text
-+---------+-----------------------+
-| Fecha   | valor de fecha        |
-| Major   | valor de major        |
-| Minor   | valor de minor        |
-| TxPower | valor de TxPower      |
-+---------+-----------------------+
+Usuario abre la página
+        |
+        v
+web_gui
+        |
+        v
+LogicaFakeNavegador.mostrarDatos()
+        |
+        v
+Medicion
+        |
+        v
+Mostrar datos en pantalla
 ```
 
-También dispone de un elemento destinado a mostrar un mensaje de error cuando no es posible obtener la medición.
+Cuando el usuario pulsa el botón `Actualizar`:
 
-## Función mostrarUltimaMedicion()
+```text
+Usuario pulsa Actualizar
+        |
+        v
+web_gui
+        |
+        v
+LogicaFakeNavegador.mostrarDatos()
+        |
+        v
+Medicion más reciente
+        |
+        v
+Actualizar datos mostrados
+```
+
+La interfaz web no conoce la ruta REST utilizada internamente.
+
+## Página principal
+
+La página contiene:
+
+```text
++--------------------------------------------------+
+|                 Última medición                  |
++--------------------------------------------------+
+|                                                  |
+| Valor:                    1234                   |
+|                                                  |
+| Fecha y hora:             ...                    |
+|                                                  |
+| Identificador del sensor: ...                    |
+|                                                  |
+| Tipo:                     11                     |
+|                                                  |
++--------------------------------------------------+
+
+[ Actualizar ]
+```
+
+El diseño se mantiene sencillo, ya que el objetivo principal del Sprint 0 es comprobar el funcionamiento completo del sistema.
+
+## app.js
+
+`app.js` coordina la interfaz gráfica.
+
+Su responsabilidad es:
+
+```text
+- obtener los elementos de la interfaz;
+- crear LogicaFakeNavegador;
+- solicitar la última medición al abrir la página;
+- mostrar los datos recibidos;
+- actualizar la información cuando el usuario pulsa Actualizar;
+- mostrar un mensaje si ocurre un error.
+```
+
+`app.js` no realiza peticiones HTTP directamente.
+
+## mostrarUltimaMedicion()
 
 ```text
 logica: LogicaFakeNavegador,
@@ -184,136 +151,138 @@ mostrarUltimaMedicion()
 -->
 ```
 
-Solicita la última medición mediante:
+Solicita:
 
 ```text
 logica.mostrarDatos()
 ```
 
-Si la operación finaliza correctamente:
+y muestra:
 
 ```text
-MedicionAlmacenada
+medicion.valor
+medicion.fecha_hora
+medicion.identificador_sensor
+medicion.tipo
+```
+
+Si ocurre un error durante la recuperación de los datos, muestra un mensaje en la interfaz.
+
+La función no realiza `fetch()` ni conoce la ruta `/medicion`.
+
+## iniciarInterfaz()
+
+```text
+iniciarInterfaz() -->
+```
+
+Inicializa la interfaz gráfica.
+
+Obtiene los elementos HTML necesarios, crea una instancia de:
+
+```text
+LogicaFakeNavegador
+```
+
+y solicita una primera medición mediante:
+
+```text
+mostrarUltimaMedicion()
+```
+
+También configura el botón:
+
+```text
+Actualizar
+```
+
+Cuando el usuario pulsa el botón:
+
+```text
+Actualizar
+    |
+    v
+mostrarUltimaMedicion()
+```
+
+Mientras se realiza la actualización, el botón puede quedar temporalmente desactivado para evitar varias solicitudes simultáneas.
+
+## Botón Actualizar
+
+El botón `Actualizar` permite solicitar manualmente la última medición disponible.
+
+```text
+pulsar Actualizar
         |
         v
-fecha    --> elemento fecha
-major    --> elemento major
-minor    --> elemento minor
-TxPower  --> elemento txPower
-```
-
-y oculta el mensaje de error.
-
-Si ocurre un error:
-
-```text
-mostrarDatos()
-      |
-      X
-      |
-      v
-mensaje de error visible
-```
-
-La función no realiza directamente ninguna petición HTTP.
-
-## Inicialización de la interfaz
-
-Cuando el documento HTML termina de cargarse:
-
-```text
-DOMContentLoaded
-      |
-      v
-Crear LogicaFakeNavegador
-      |
-      v
-Obtener elementos HTML
-      |
-      v
 mostrarUltimaMedicion()
+        |
+        v
+LogicaFakeNavegador.mostrarDatos()
+        |
+        v
+nueva Medicion
+        |
+        v
+actualizar interfaz
 ```
 
-La instancia de `LogicaFakeNavegador` pertenece conceptualmente al componente `web_frontend_business_logic`.
+La actualización es manual.
 
-La GUI únicamente utiliza su operación pública:
+No se realizan consultas periódicas automáticas.
+
+## Relación con web_frontend_business_logic
 
 ```text
-mostrarDatos()
+web_gui
+   |
+   | mostrarDatos()
+   v
+LogicaFakeNavegador
+   |
+   v
+Backend
 ```
 
-## Archivos del componente
-
-El componente `web_gui` está formado por:
+La separación de responsabilidades debe mantenerse:
 
 ```text
-src/web_gui/
-├── index.html
-├── styles.css
-├── app.js
-└── WebTest.js
+web_gui
+    NO conoce HTTP
+    NO conoce rutas REST
+    NO accede a la BBDD
+
+web_frontend_business_logic
+    encapsula la comunicación
 ```
-
-### index.html
-
-Define la estructura visual de la página y los elementos donde se muestran:
-
-```text
-Fecha
-Major
-Minor
-TxPower
-Error
-```
-
-### styles.css
-
-Define exclusivamente la presentación visual de la página.
-
-No contiene lógica de negocio ni mecanismos de comunicación.
-
-### app.js
-
-Contiene la lógica de presentación de la interfaz.
-
-Su operación principal es:
-
-```text
-logica: LogicaFakeNavegador,
-elementos: ElementosGUI
--->
-mostrarUltimaMedicion()
--->
-```
-
-`app.js` no utiliza directamente `fetch()` ni conoce rutas REST.
-
-### WebTest.js
-
-Contiene las pruebas automatizadas de la interfaz gráfica.
-
-Utiliza una lógica fake controlada para comprobar la representación de los datos sin depender de un backend real.
 
 # Aclaraciones del Diseño
 
-- El componente se denomina `web_gui`.
-- `web_gui` está separado de `web_frontend_business_logic`.
-- La GUI no contiene `fetch()`.
-- La GUI no conoce la ruta `GET /medicion`.
-- La comunicación con el backend queda encapsulada en `LogicaFakeNavegador`.
-- La interfaz recibe una `MedicionAlmacenada`.
-- La pantalla no muestra `id` ni `uuid`.
-- La pantalla muestra `fecha`, `major`, `minor` y `TxPower`.
-- Si `mostrarDatos()` falla, se muestra un mensaje de error.
-- `WebTest.js` comprueba la visualización correcta de los datos y el comportamiento ante errores.
-- La apariencia visual se define mediante `styles.css`.
+- La página muestra únicamente la última medición almacenada.
+- La interfaz es sencilla.
+- Se muestran `valor`, `fecha_hora`, `identificador_sensor` y `tipo`.
+- No existe un campo `id`.
+- No se muestran Major, Minor ni TxPower.
+- `valor` contiene el valor que originalmente procede del Minor.
+- `tipo` contiene el tipo extraído originalmente del Major.
+- `identificador_sensor` corresponde al UUID del sensor.
+- La GUI utiliza `LogicaFakeNavegador.mostrarDatos()`.
+- La GUI no realiza directamente peticiones HTTP.
+- La GUI no accede directamente a la base de datos.
+- La última medición se solicita al abrir la página.
+- El usuario puede volver a solicitar la última medición mediante el botón `Actualizar`.
+- La actualización es manual y no periódica.
+- Mientras se realiza una actualización, el botón puede desactivarse temporalmente.
+- Si ocurre un error al recuperar la medición, se muestra un mensaje al usuario.
 
 # Reglas Generales
 
-- **Lenguaje de Programación:** HTML5 para la estructura, CSS para la presentación y JavaScript para la lógica de interfaz y las pruebas.
-- **Encabezados de Funciones/Métodos:** cada función o método propio deberá incluir su diseño lógico dentro de un bloque de comentarios delimitado por líneas discontinuas (`--------------------`).
-- **Legibilidad del Código:** la lógica de presentación deberá ser clara y mantenerse separada de la comunicación con el backend.
-- **Separación de Responsabilidades:** `web_gui` no podrá contener `fetch()`, rutas REST ni mecanismos directos de comunicación HTTP.
-- **Dependencias:** `web_gui` podrá utilizar `web_frontend_business_logic`, pero no deberá acceder directamente a los mecanismos internos de comunicación.
-- **Presentación:** este componente será responsable únicamente de mostrar los datos y mensajes correspondientes al usuario.
-- **Pruebas Automatizadas:** se deberán mantener pruebas para la representación de la medición y el comportamiento de la interfaz ante errores.
+- **Lenguajes:** HTML, CSS y JavaScript.
+- **Interfaz:** sencilla, clara y orientada a comprobar el funcionamiento del Sprint 0.
+- **Encabezados de Funciones/Métodos:** cada función JavaScript deberá incluir su diseño lógico dentro de comentarios delimitados por líneas discontinuas (`--------------------`).
+- **Legibilidad del Código:** HTML, CSS y JavaScript deberán mantenerse separados.
+- **Separación de Responsabilidades:** `web_gui` no realizará peticiones HTTP directamente.
+- **Comunicación:** la recuperación de datos se realizará mediante `web_frontend_business_logic`.
+- **Actualización:** la última medición podrá solicitarse manualmente mediante el botón `Actualizar`.
+- **Persistencia:** la interfaz no accede directamente a la base de datos.
+- **Pruebas Automatizadas:** se deberán mantener pruebas que comprueben que los datos recibidos se muestran correctamente en la interfaz.

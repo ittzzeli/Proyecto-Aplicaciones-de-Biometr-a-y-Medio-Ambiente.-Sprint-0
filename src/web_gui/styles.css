@@ -1,6 +1,16 @@
 /* ------------------------------------------------------------
-   Estilos básicos de la interfaz.
+   Archivo: styles.css
+
+   Descripción:
+   Estilos básicos de la interfaz web del Sprint 0.
+
+   Autor: Élia Garcia Pons
+   Fecha: 14/10/2026
+
+   Copyright:
+   Uso académico - Proyecto de Biometría y Medio Ambiente.
    ------------------------------------------------------------ */
+
 
 body {
     font-family: Arial, sans-serif;
@@ -8,31 +18,39 @@ body {
 }
 
 
+.contenedor {
+    max-width: 650px;
+}
+
+
+h1 {
+    margin-bottom: 20px;
+}
+
+
 .medicion {
-    width: 400px;
     border: 1px solid black;
+    padding: 20px;
 }
 
 
-.medicion h1 {
-    margin: 0;
-    padding: 12px;
-    border-bottom: 1px solid black;
+.medicion p {
+    margin: 12px 0;
 }
 
 
-.datos {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
+.medicion strong {
+    display: inline-block;
+    min-width: 190px;
 }
 
 
-.datos span {
-    padding: 8px 12px;
-    border-bottom: 1px solid #ccc;
+.error {
+    margin-top: 20px;
 }
 
-
-#error {
-    padding: 10px;
+#botonActualizar {
+    margin-top: 20px;
+    padding: 10px 20px;
+    cursor: pointer;
 }
