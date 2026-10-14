@@ -6,12 +6,12 @@
 //
 // Comprueba:
 // - uso de GET /medicion;
-// - recuperación de MedicionAlmacenada;
-// - datos devueltos por el backend;
+// - recuperación de una Medicion;
+// - campos del nuevo modelo;
 // - gestión de respuestas HTTP incorrectas.
 //
 // Autor: Élia Garcia Pons
-// Fecha: 13/10/2026
+// Fecha: 14/10/2026
 //
 // Copyright:
 // Uso académico - Proyecto de Biometría y Medio Ambiente.
@@ -27,11 +27,6 @@ const LogicaFakeNavegador =
 // mensaje: Text
 // --> comprobar() -->
 // ------------------------------------------------------------
-//
-// Comprueba el resultado de un test.
-//
-// Si la condición no se cumple lanza un error.
-// ------------------------------------------------------------
 function comprobar(
     condicion,
     mensaje
@@ -41,88 +36,78 @@ function comprobar(
 
         throw new Error(
             "TEST FALLIDO: "
-                + mensaje
+            + mensaje
         );
     }
 
 
     console.log(
         "OK - "
-            + mensaje
+        + mensaje
     );
 }
 
 
 // ------------------------------------------------------------
-// ejecutarTests() -->
+// testMostrarDatos() -->
 // ------------------------------------------------------------
 //
-// Ejecuta las pruebas automatizadas de
-// LogicaFakeNavegador.
+// Comprueba que mostrarDatos() utiliza GET /medicion
+// y devuelve correctamente una Medicion.
 // ------------------------------------------------------------
-async function ejecutarTests() {
+async function testMostrarDatos() {
+
+    let metodoRecibido =
+        null;
 
     let urlRecibida =
         null;
 
-    let opcionesRecibidas =
-        null;
+
+    const medicionEsperada = {
+
+        valor:
+            1234,
+
+        fecha_hora:
+            "2026-10-14 09:06:41",
+
+        identificador_sensor:
+            "45505347-2D47-5449-2D50-524F592D3341",
+
+        tipo:
+            11
+    };
 
 
-    // --------------------------------------------------------
-    // url: Text,
-    // opciones: PeticionHTTP
-    // --> fetchFake()
-    // --> respuesta: RespuestaHTTP
-    // --------------------------------------------------------
-    //
-    // Simula una respuesta correcta del backend.
-    // --------------------------------------------------------
-    async function fetchFake(
-        url,
-        opciones
-    ) {
+    const fetchFake =
+        async (
+            url,
+            opciones
+        ) => {
 
-        urlRecibida =
-            url;
+            urlRecibida =
+                url;
 
-        opcionesRecibidas =
-            opciones;
+            metodoRecibido =
+                opciones.method;
 
 
-        return {
+            return {
 
-            ok:
-                true,
+                ok:
+                    true,
 
-            async json() {
-
-                return {
-                    id: 1,
-
-                    uuid:
-                        "45505347-2D47-5449-2D50-524F592D3341",
-
-                    fecha:
-                        "2026-10-13 10:00:00",
-
-                    major:
-                        2821,
-
-                    minor:
-                        1234,
-
-                    TxPower:
-                        -53
-                };
-            }
+                json:
+                    async () =>
+                        medicionEsperada
+            };
         };
-    }
 
 
     const logica =
         new LogicaFakeNavegador(
-            "http://127.0.0.1:8000",
+            "https://servidor-pruebas",
             fetchFake
         );
 
@@ -131,144 +116,88 @@ async function ejecutarTests() {
         await logica.mostrarDatos();
 
 
-    // --------------------------------------------------------
-    // TEST 1
-    //
-    // Comprobar la ruta utilizada.
-    // --------------------------------------------------------
-
     comprobar(
         urlRecibida
             ===
-        "http://127.0.0.1:8000/medicion",
+        "https://servidor-pruebas/medicion",
 
         "mostrarDatos() utiliza /medicion"
     );
 
 
-    // --------------------------------------------------------
-    // TEST 2
-    //
-    // Comprobar el método HTTP.
-    // --------------------------------------------------------
-
     comprobar(
-        opcionesRecibidas.method
+        metodoRecibido
             ===
         "GET",
 
-        "mostrarDatos() realiza una peticion GET"
+        "mostrarDatos() utiliza GET"
     );
 
 
-    // --------------------------------------------------------
-    // TEST 3
-    //
-    // Comprobar id.
-    // --------------------------------------------------------
-
     comprobar(
-        medicion.id
-            ===
-        1,
-
-        "ID correcto"
-    );
-
-
-    // --------------------------------------------------------
-    // TEST 4
-    //
-    // Comprobar UUID.
-    // --------------------------------------------------------
-
-    comprobar(
-        medicion.uuid
-            ===
-        "45505347-2D47-5449-2D50-524F592D3341",
-
-        "UUID correcto"
-    );
-
-
-    // --------------------------------------------------------
-    // TEST 5
-    //
-    // Comprobar fecha.
-    // --------------------------------------------------------
-
-    comprobar(
-        medicion.fecha
-            ===
-        "2026-10-13 10:00:00",
-
-        "Fecha correcta"
-    );
-
-
-    // --------------------------------------------------------
-    // TEST 6
-    //
-    // Comprobar Major.
-    // --------------------------------------------------------
-
-    comprobar(
-        medicion.major
-            ===
-        2821,
-
-        "Major correcto"
-    );
-
-
-    // --------------------------------------------------------
-    // TEST 7
-    //
-    // Comprobar Minor.
-    // --------------------------------------------------------
-
-    comprobar(
-        medicion.minor
+        medicion.valor
             ===
         1234,
 
-        "Minor correcto"
+        "Valor correcto"
     );
 
-
-    // --------------------------------------------------------
-    // TEST 8
-    //
-    // Comprobar TxPower.
-    // --------------------------------------------------------
 
     comprobar(
-        medicion.TxPower
+        medicion.fecha_hora
             ===
-        -53,
+        "2026-10-14 09:06:41",
 
-        "TxPower correcto"
+        "Fecha y hora correctas"
     );
 
 
-    // --------------------------------------------------------
-    // TEST 9
-    //
-    // Comprobar respuesta HTTP incorrecta.
-    // --------------------------------------------------------
+    comprobar(
+        medicion.identificador_sensor
+            ===
+        "45505347-2D47-5449-2D50-524F592D3341",
 
-    async function fetchError() {
+        "Identificador del sensor correcto"
+    );
 
-        return {
-            ok: false
+
+    comprobar(
+        medicion.tipo
+            ===
+        11,
+
+        "Tipo correcto"
+    );
+}
+
+
+// ------------------------------------------------------------
+// testErrorHttp() -->
+// ------------------------------------------------------------
+//
+// Comprueba que mostrarDatos() informa de un error
+// cuando el backend devuelve una respuesta incorrecta.
+// ------------------------------------------------------------
+async function testErrorHttp() {
+
+    const fetchFake =
+        async () => {
+
+            return {
+
+                ok:
+                    false,
+
+                status:
+                    500
+            };
         };
-    }
 
 
-    const logicaError =
+    const logica =
         new LogicaFakeNavegador(
-            "http://127.0.0.1:8000",
-            fetchError
+            "https://servidor-pruebas",
+            fetchFake
         );
 
 
@@ -278,7 +207,7 @@ async function ejecutarTests() {
 
     try {
 
-        await logicaError.mostrarDatos();
+        await logica.mostrarDatos();
 
     } catch (error) {
 
@@ -291,19 +220,46 @@ async function ejecutarTests() {
         errorDetectado,
         "mostrarDatos() detecta errores HTTP"
     );
+}
+
+
+// ------------------------------------------------------------
+// ejecutarTests() -->
+// ------------------------------------------------------------
+//
+// Ejecuta todas las pruebas del componente.
+// ------------------------------------------------------------
+async function ejecutarTests() {
+
+    await testMostrarDatos();
+
+    await testErrorHttp();
 
 
     console.log("");
 
     console.log(
-        "TODOS LOS TESTS DE LA LOGICA FAKE "
-            + "DEL NAVEGADOR HAN FINALIZADO CORRECTAMENTE."
+        "TODOS LOS TESTS DE "
+        + "WEB_FRONTEND_BUSINESS_LOGIC "
+        + "HAN FINALIZADO CORRECTAMENTE."
     );
 }
 
 
 // ------------------------------------------------------------
-// Ejecutar las pruebas.
+// Ejecutar tests.
 // ------------------------------------------------------------
 
-ejecutarTests();
+ejecutarTests()
+    .catch(
+        error => {
+
+            console.error(
+                error
+            );
+
+            process.exit(
+                1
+            );
+        }
+    );

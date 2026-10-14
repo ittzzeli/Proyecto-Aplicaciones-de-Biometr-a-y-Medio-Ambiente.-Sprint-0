@@ -2,17 +2,16 @@
 // Archivo: LogicaFakeNavegador.js
 //
 // Descripción:
-// Implementa la lógica de negocio fake/proxy utilizada
-// por el cliente web.
+// Implementa la lógica fake/proxy utilizada por el navegador.
 //
-// Representa la operación mostrarDatos() del backend,
-// realizando internamente una petición GET /medicion.
+// Permite a la interfaz web solicitar la última medición
+// almacenada sin realizar directamente peticiones HTTP.
 //
-// La interfaz gráfica no necesita conocer cómo se realiza
-// la comunicación HTTP.
+// La comunicación con el backend queda encapsulada en
+// este componente.
 //
 // Autor: Élia Garcia Pons
-// Fecha: 13/10/2026
+// Fecha: 14/10/2026
 //
 // Copyright:
 // Uso académico - Proyecto de Biometría y Medio Ambiente.
@@ -22,16 +21,13 @@
 class LogicaFakeNavegador {
 
     // ------------------------------------------------------------
-    // servidor: Text,
-    // fetch_impl: FuncionHTTP
+    // servidor: Text
     // --> LogicaFakeNavegador() -->
     // ------------------------------------------------------------
     //
-    // Recibe la dirección base del servidor y la función
-    // utilizada para realizar peticiones HTTP.
+    // Recibe la dirección base del servidor.
     //
-    // fetchImpl puede sustituirse durante los tests para evitar
-    // realizar comunicaciones HTTP reales.
+    // fetchImpl permite sustituir fetch durante las pruebas.
     // ------------------------------------------------------------
     constructor(
         servidor,
@@ -48,31 +44,32 @@ class LogicaFakeNavegador {
 
     // ------------------------------------------------------------
     // mostrarDatos()
-    // --> medicion: MedicionAlmacenada
+    // --> medicion: Medicion
     // ------------------------------------------------------------
     //
-    // Mantiene la misma operación lógica mostrarDatos()
-    // que business_logic.
+    // Solicita al backend la última Medicion almacenada.
     //
-    // Realiza internamente:
+    // Utiliza:
     //
     // GET /medicion
     //
-    // y devuelve la última Medicion almacenada.
+    // La Medicion recibida contiene:
+    //
+    // - valor
+    // - fecha_hora
+    // - identificador_sensor
+    // - tipo
     // ------------------------------------------------------------
     async mostrarDatos() {
 
         const respuesta =
             await this.fetchImpl(
-                this.servidor
-                    + "/medicion",
+                this.servidor + "/medicion",
                 {
-                    method:
-                        "GET",
+                    method: "GET",
 
                     headers: {
-                        "Accept":
-                            "application/json"
+                        "Accept": "application/json"
                     }
                 }
             );
@@ -81,24 +78,19 @@ class LogicaFakeNavegador {
         if (!respuesta.ok) {
 
             throw new Error(
-                "No se pudo obtener la Medicion"
+                "No se ha podido recuperar la medición."
             );
         }
 
 
-        const medicion =
-            await respuesta.json();
-
-
-        return medicion;
+        return await respuesta.json();
     }
 }
 
 
 // ------------------------------------------------------------
-// Exportación utilizada exclusivamente por los tests Node.js.
+// Permite utilizar la clase desde los tests ejecutados con Node.
 // ------------------------------------------------------------
-
 if (
     typeof module !== "undefined"
     &&
