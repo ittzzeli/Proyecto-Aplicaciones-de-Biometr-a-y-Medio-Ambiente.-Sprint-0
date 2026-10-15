@@ -16,6 +16,10 @@
 //
 // Copyright:
 // Uso académico - Proyecto de Biometría y Medio Ambiente.
+//
+// Aportación:
+// Implementa la capa REST que valida las peticiones y delega las
+// operaciones en la lógica de negocio.
 // ------------------------------------------------------------
 
 

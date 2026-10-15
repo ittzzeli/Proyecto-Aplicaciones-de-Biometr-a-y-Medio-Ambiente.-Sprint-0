@@ -15,6 +15,11 @@
 //
 // Copyright:
 // Uso académico - Proyecto de Biometría y Medio Ambiente.
+//
+// Aportación:
+// Encapsula la recuperación de la última medición desde
+// el backend para que la interfaz web no realice
+// peticiones HTTP directamente.
 // ------------------------------------------------------------
 
 
@@ -85,6 +90,9 @@ class LogicaFakeNavegador {
                 {
                     method:
                         "GET",
+
+                    cache:
+                        "no-store",
 
                     headers: {
                         "Accept":

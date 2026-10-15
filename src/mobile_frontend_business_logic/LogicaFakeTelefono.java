@@ -18,6 +18,10 @@ package com.example.biometriasprint0;
 //
 // Copyright:
 // Uso académico - Proyecto de Biometría y Medio Ambiente.
+//
+// Aportación:
+// Implementa el proxy de lógica de negocio utilizado por Android
+// para enviar mediciones al backend.
 // ------------------------------------------------------------
 
 import java.io.IOException;

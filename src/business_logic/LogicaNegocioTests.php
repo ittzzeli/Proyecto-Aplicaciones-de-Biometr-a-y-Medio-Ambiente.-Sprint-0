@@ -16,6 +16,10 @@
 //
 // Copyright:
 // Uso académico - Proyecto de Biometría y Medio Ambiente.
+//
+// Aportación:
+// Verifica automáticamente el almacenamiento y la recuperación de
+// mediciones realizados por LogicaNegocio.
 // ------------------------------------------------------------
 
 

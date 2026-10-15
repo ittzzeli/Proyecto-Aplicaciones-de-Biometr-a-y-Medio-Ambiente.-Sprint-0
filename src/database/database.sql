@@ -17,6 +17,10 @@
 --
 -- Copyright:
 -- Uso académico - Proyecto de Biometría y Medio Ambiente.
+--
+-- Aportación:
+-- Define de forma reproducible la tabla MEDICIONES utilizada
+-- por la lógica de negocio del Sprint 0.
 -- ------------------------------------------------------------
 
 

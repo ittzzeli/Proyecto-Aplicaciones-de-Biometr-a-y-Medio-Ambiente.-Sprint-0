@@ -23,6 +23,10 @@ package com.example.biometriasprint0;
 //
 // Copyright:
 // Uso académico - Proyecto de Biometría y Medio Ambiente.
+//
+// Aportación:
+// Define el modelo de medición compartido por la lógica frontend
+// del cliente Android.
 // ------------------------------------------------------------
 
 public class Medicion {
@@ -60,6 +64,9 @@ public class Medicion {
     // ------------------------------------------------------------
     // getValor() --> valor: Z
     // ------------------------------------------------------------
+    //
+    // Devuelve el valor de la medición.
+    // ------------------------------------------------------------
     public int getValor() {
         return valor;
     }
@@ -67,6 +74,9 @@ public class Medicion {
 
     // ------------------------------------------------------------
     // getFechaHora() --> fecha_hora: Text
+    // ------------------------------------------------------------
+    //
+    // Devuelve la fecha y hora asociadas a la medición.
     // ------------------------------------------------------------
     public String getFechaHora() {
         return fechaHora;
@@ -77,6 +87,9 @@ public class Medicion {
     // getIdentificadorSensor()
     // --> identificador_sensor: Text
     // ------------------------------------------------------------
+    //
+    // Devuelve el identificador único del sensor.
+    // ------------------------------------------------------------
     public String getIdentificadorSensor() {
         return identificadorSensor;
     }
@@ -84,6 +97,9 @@ public class Medicion {
 
     // ------------------------------------------------------------
     // getTipo() --> tipo: Z
+    // ------------------------------------------------------------
+    //
+    // Devuelve el tipo de medición.
     // ------------------------------------------------------------
     public int getTipo() {
         return tipo;

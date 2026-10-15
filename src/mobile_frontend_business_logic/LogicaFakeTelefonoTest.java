@@ -18,6 +18,10 @@ package com.example.biometriasprint0;
 //
 // Copyright:
 // Uso académico - Proyecto de Biometría y Medio Ambiente.
+//
+// Aportación:
+// Verifica automáticamente la creación del JSON y el envío de
+// mediciones realizado por LogicaFakeTelefono.
 // ------------------------------------------------------------
 
 import static org.junit.Assert.assertEquals;
@@ -56,6 +60,9 @@ public class LogicaFakeTelefonoTest {
 
         // ------------------------------------------------------------
         // PeticionarioRESTFake() -->
+        // ------------------------------------------------------------
+        //
+        // Crea un peticionario de prueba sin utilizar un servidor real.
         // ------------------------------------------------------------
         public PeticionarioRESTFake() {
 

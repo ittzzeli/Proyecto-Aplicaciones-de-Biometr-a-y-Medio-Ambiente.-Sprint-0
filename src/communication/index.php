@@ -12,7 +12,7 @@
 //
 // Este archivo no contiene consultas SQL ni lógica de negocio.
 //
-// Autor: Elia
+// Autor: Élia Garcia Pons
 // Fecha: 08/10/2026
 //
 // Aportación:
@@ -36,7 +36,7 @@ require_once __DIR__
 // La conexión se crea aquí únicamente para construir
 // LogicaNegocio.
 //
-// Las operaciones sobre la tabla Medicion siguen siendo
+// Las operaciones sobre la tabla MEDICIONES siguen siendo
 // responsabilidad del componente business_logic.
 // ------------------------------------------------------------
 

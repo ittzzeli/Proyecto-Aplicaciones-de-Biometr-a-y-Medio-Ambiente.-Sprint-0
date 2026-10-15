@@ -21,6 +21,10 @@ package com.example.biometriasprint0;
 //
 // Copyright:
 // Uso académico - Proyecto de Biometría y Medio Ambiente.
+//
+// Aportación:
+// Descompone la trama iBeacon recibida para exponer sus campos
+// de forma independiente al resto de la interfaz Android.
 // ------------------------------------------------------------
 
 import java.util.Arrays;
@@ -149,6 +153,9 @@ public class TramaIBeacon {
     // ------------------------------------------------------------
     // getPrefijo() --> prefijo: [ N ]_9
     // ------------------------------------------------------------
+    //
+    // Devuelve una copia del prefijo de la trama iBeacon.
+    // ------------------------------------------------------------
     public byte[] getPrefijo() {
 
         return Arrays.copyOf(
@@ -160,6 +167,9 @@ public class TramaIBeacon {
 
     // ------------------------------------------------------------
     // getUUID() --> uuid: [ N ]_16
+    // ------------------------------------------------------------
+    //
+    // Devuelve una copia del UUID contenido en la trama.
     // ------------------------------------------------------------
     public byte[] getUUID() {
 
@@ -173,6 +183,9 @@ public class TramaIBeacon {
     // ------------------------------------------------------------
     // getMajor() --> major: [ N ]_2
     // ------------------------------------------------------------
+    //
+    // Devuelve una copia de los dos bytes del campo Major.
+    // ------------------------------------------------------------
     public byte[] getMajor() {
 
         return Arrays.copyOf(
@@ -184,6 +197,9 @@ public class TramaIBeacon {
 
     // ------------------------------------------------------------
     // getMinor() --> minor: [ N ]_2
+    // ------------------------------------------------------------
+    //
+    // Devuelve una copia de los dos bytes del campo Minor.
     // ------------------------------------------------------------
     public byte[] getMinor() {
 
@@ -197,6 +213,9 @@ public class TramaIBeacon {
     // ------------------------------------------------------------
     // getTxPower() --> TxPower: Z
     // ------------------------------------------------------------
+    //
+    // Devuelve el valor TxPower incluido en la trama iBeacon.
+    // ------------------------------------------------------------
     public int getTxPower() {
 
         return txPower;
@@ -205,6 +224,9 @@ public class TramaIBeacon {
 
     // ------------------------------------------------------------
     // getAdvFlags() --> adv_flags: [ N ]_3
+    // ------------------------------------------------------------
+    //
+    // Devuelve una copia de los flags de advertising.
     // ------------------------------------------------------------
     public byte[] getAdvFlags() {
 
@@ -218,6 +240,9 @@ public class TramaIBeacon {
     // ------------------------------------------------------------
     // getAdvHeader() --> adv_header: [ N ]_2
     // ------------------------------------------------------------
+    //
+    // Devuelve una copia de la cabecera de advertising.
+    // ------------------------------------------------------------
     public byte[] getAdvHeader() {
 
         return Arrays.copyOf(
@@ -229,6 +254,9 @@ public class TramaIBeacon {
 
     // ------------------------------------------------------------
     // getCompanyID() --> company_id: [ N ]_2
+    // ------------------------------------------------------------
+    //
+    // Devuelve una copia del identificador del fabricante.
     // ------------------------------------------------------------
     public byte[] getCompanyID() {
 
@@ -242,6 +270,9 @@ public class TramaIBeacon {
     // ------------------------------------------------------------
     // getIBeaconType() --> ibeacon_type: N
     // ------------------------------------------------------------
+    //
+    // Devuelve el byte que identifica el tipo iBeacon.
+    // ------------------------------------------------------------
     public int getIBeaconType() {
 
         return iBeaconType;
@@ -250,6 +281,9 @@ public class TramaIBeacon {
 
     // ------------------------------------------------------------
     // getIBeaconLength() --> ibeacon_length: N
+    // ------------------------------------------------------------
+    //
+    // Devuelve la longitud declarada de los datos iBeacon.
     // ------------------------------------------------------------
     public int getIBeaconLength() {
 

@@ -20,6 +20,10 @@ package com.example.biometriasprint0;
 //
 // Copyright:
 // Uso académico - Proyecto de Biometría y Medio Ambiente.
+//
+// Aportación:
+// Integra el escaneo BLE, la interpretación de Elia_GTI y la
+// entrega de nuevas mediciones a LogicaFakeTelefono.
 // ------------------------------------------------------------
 
 import android.Manifest;
@@ -948,6 +952,9 @@ public class MainActivity extends AppCompatActivity {
                 // resultado: ResultadoBLE
                 // --> onScanResult() -->
                 // ------------------------------------------------
+                //
+                // Procesa un resultado individual recibido durante el escaneo.
+                // ------------------------------------------------
                 @Override
                 public void onScanResult(
                         int callbackType,
@@ -969,6 +976,9 @@ public class MainActivity extends AppCompatActivity {
                 // ------------------------------------------------
                 // resultados: [ ResultadoBLE ]
                 // --> onBatchScanResults() -->
+                // ------------------------------------------------
+                //
+                // Procesa un lote de resultados recibido durante el escaneo.
                 // ------------------------------------------------
                 @Override
                 public void onBatchScanResults(
@@ -996,6 +1006,9 @@ public class MainActivity extends AppCompatActivity {
                 // ------------------------------------------------
                 // codigo_error: Z
                 // --> onScanFailed() -->
+                // ------------------------------------------------
+                //
+                // Informa del error cuando Android no puede continuar el escaneo.
                 // ------------------------------------------------
                 @Override
                 public void onScanFailed(

@@ -18,6 +18,10 @@ package com.example.biometriasprint0;
 //
 // Copyright:
 // Uso académico - Proyecto de Biometría y Medio Ambiente.
+//
+// Aportación:
+// Agrupa conversiones auxiliares utilizadas al interpretar los
+// campos binarios de una trama iBeacon.
 // ------------------------------------------------------------
 
 import java.nio.charset.StandardCharsets;

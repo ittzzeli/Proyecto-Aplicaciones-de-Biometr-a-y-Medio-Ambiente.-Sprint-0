@@ -1,5 +1,26 @@
 <?xml version="1.0" encoding="utf-8"?>
 
+<!--
+    ============================================================
+    Archivo: activity_main.xml
+
+    Descripción:
+    Define la interfaz gráfica principal de la aplicación Android
+    del Sprint 0, con controles para buscar Elia_GTI, detener el
+    escaneo y mostrar el estado de la aplicación.
+
+    Autor: Élia Garcia Pons
+    Fecha: 14/10/2026
+
+    Copyright:
+    Uso académico - Proyecto de Biometría y Medio Ambiente.
+
+    Aportación:
+    Define la disposición de los elementos visuales utilizados por
+    MainActivity sin incorporar lógica de comunicación.
+    ============================================================
+-->
+
 <androidx.constraintlayout.widget.ConstraintLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"

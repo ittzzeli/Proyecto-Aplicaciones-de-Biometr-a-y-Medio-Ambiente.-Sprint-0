@@ -17,6 +17,10 @@
 //
 // Copyright:
 // Uso académico - Proyecto de Biometría y Medio Ambiente.
+//
+// Aportación:
+// Verifica automáticamente la presentación de la última medición
+// y el tratamiento de errores de la interfaz web.
 // ------------------------------------------------------------
 
 
@@ -30,6 +34,9 @@ const {
 // condicion: B,
 // mensaje: Text
 // --> comprobar() -->
+// ------------------------------------------------------------
+//
+// Comprueba una condición del test y lanza un error si no se cumple.
 // ------------------------------------------------------------
 function comprobar(
     condicion,
@@ -79,6 +86,12 @@ async function testMostrarMedicion() {
 
     const logicaFake = {
 
+        // --------------------------------------------------------
+        // mostrarDatos() --> medicion: Medicion
+        // --------------------------------------------------------
+        //
+        // Devuelve una medición conocida para probar la interfaz.
+        // --------------------------------------------------------
         async mostrarDatos() {
 
             return {
@@ -181,6 +194,12 @@ async function testMostrarError() {
 
     const logicaFake = {
 
+        // --------------------------------------------------------
+        // mostrarDatos() --> medicion: Medicion
+        // --------------------------------------------------------
+        //
+        // Simula un fallo al recuperar la medición.
+        // --------------------------------------------------------
         async mostrarDatos() {
 
             throw new Error(

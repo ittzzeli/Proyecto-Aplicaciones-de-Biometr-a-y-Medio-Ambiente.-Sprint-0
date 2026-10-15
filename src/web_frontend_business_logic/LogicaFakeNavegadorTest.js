@@ -6,8 +6,9 @@
 //
 // Comprueba:
 // - uso de GET /medicion;
+// - desactivación de caché;
 // - recuperación de una Medicion;
-// - campos del nuevo modelo;
+// - campos del modelo;
 // - gestión de respuestas HTTP incorrectas.
 //
 // Autor: Élia Garcia Pons
@@ -15,6 +16,10 @@
 //
 // Copyright:
 // Uso académico - Proyecto de Biometría y Medio Ambiente.
+//
+// Aportación:
+// Comprueba automáticamente el comportamiento de
+// LogicaFakeNavegador.
 // ------------------------------------------------------------
 
 
@@ -26,6 +31,9 @@ const LogicaFakeNavegador =
 // condicion: B,
 // mensaje: Text
 // --> comprobar() -->
+// ------------------------------------------------------------
+//
+// Comprueba una condición y lanza un error si no se cumple.
 // ------------------------------------------------------------
 function comprobar(
     condicion,
@@ -52,8 +60,11 @@ function comprobar(
 // testMostrarDatos() -->
 // ------------------------------------------------------------
 //
-// Comprueba que mostrarDatos() utiliza GET /medicion
-// y devuelve correctamente una Medicion.
+// Comprueba que mostrarDatos():
+//
+// - utiliza GET /medicion;
+// - evita utilizar caché;
+// - devuelve correctamente una Medicion.
 // ------------------------------------------------------------
 async function testMostrarDatos() {
 
@@ -61,6 +72,9 @@ async function testMostrarDatos() {
         null;
 
     let urlRecibida =
+        null;
+
+    let cacheRecibida =
         null;
 
 
@@ -91,6 +105,9 @@ async function testMostrarDatos() {
 
             metodoRecibido =
                 opciones.method;
+
+            cacheRecibida =
+                opciones.cache;
 
 
             return {
@@ -131,6 +148,15 @@ async function testMostrarDatos() {
         "GET",
 
         "mostrarDatos() utiliza GET"
+    );
+
+
+    comprobar(
+        cacheRecibida
+            ===
+        "no-store",
+
+        "mostrarDatos() evita utilizar respuestas almacenadas en cache"
     );
 
 

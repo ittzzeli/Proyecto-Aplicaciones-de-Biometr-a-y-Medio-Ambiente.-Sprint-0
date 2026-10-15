@@ -18,6 +18,10 @@ package com.example.biometriasprint0;
 //
 // Copyright:
 // Uso académico - Proyecto de Biometría y Medio Ambiente.
+//
+// Aportación:
+// Representa de forma sencilla el código y el cuerpo recibidos
+// como respuesta del backend.
 // ------------------------------------------------------------
 
 public class RespuestaREST {
@@ -48,6 +52,9 @@ public class RespuestaREST {
     // ------------------------------------------------------------
     // getCodigo() --> codigo: N
     // ------------------------------------------------------------
+    //
+    // Devuelve el código HTTP recibido del backend.
+    // ------------------------------------------------------------
     public int getCodigo() {
 
         return codigo;
@@ -56,6 +63,9 @@ public class RespuestaREST {
 
     // ------------------------------------------------------------
     // getJson() --> json: Text
+    // ------------------------------------------------------------
+    //
+    // Devuelve el cuerpo de la respuesta recibido del backend.
     // ------------------------------------------------------------
     public String getJson() {
 

@@ -17,6 +17,10 @@
 //
 // Copyright:
 // Uso académico - Proyecto de Biometría y Medio Ambiente.
+//
+// Aportación:
+// Coordina la interfaz web y permite solicitar manualmente la
+// última medición mediante LogicaFakeNavegador.
 // ------------------------------------------------------------
 
 

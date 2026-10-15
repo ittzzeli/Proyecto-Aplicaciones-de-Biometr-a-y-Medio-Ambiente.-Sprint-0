@@ -17,6 +17,10 @@ package com.example.biometriasprint0;
 //
 // Copyright:
 // Uso académico - Proyecto de Biometría y Medio Ambiente.
+//
+// Aportación:
+// Encapsula las peticiones HTTP para mantener los detalles de
+// transporte fuera de la interfaz gráfica Android.
 // ------------------------------------------------------------
 
 import java.io.BufferedReader;

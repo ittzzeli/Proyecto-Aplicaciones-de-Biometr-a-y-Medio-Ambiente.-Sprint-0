@@ -8,10 +8,14 @@ package com.example.biometriasprint0;
 // una trama iBeacon conocida.
 //
 // Autor: Élia Garcia Pons
-// Fecha: 12/10/2026
+// Fecha: 14/10/2026
 //
 // Copyright:
 // Uso académico - Proyecto de Biometría y Medio Ambiente.
+//
+// Aportación:
+// Comprueba la interpretación de UUID, Major, Minor,
+// TxPower, tipo de sensor y contador de medición.
 // ------------------------------------------------------------
 
 import static org.junit.Assert.assertEquals;
@@ -35,6 +39,12 @@ public class TramaIBeaconTest {
     //
     // Major:
     // 0x0B05 = 2821
+    //
+    // Tipo:
+    // 0x0B = 11
+    //
+    // Contador:
+    // 0x05 = 5
     //
     // Minor:
     // 0x04D2 = 1234
@@ -120,12 +130,49 @@ public class TramaIBeaconTest {
 
 
         // --------------------------------------------------------
+        // Obtener tipo y contador a partir del Major.
+        //
+        // Major = 0x0B05
+        //
+        // byte alto = tipo
+        // byte bajo = contador
+        // --------------------------------------------------------
+
+        int tipo =
+                (major >> 8) & 0xFF;
+
+
+        int contador =
+                major & 0xFF;
+
+
+        // --------------------------------------------------------
         // Comprobar Major.
         // --------------------------------------------------------
 
         assertEquals(
                 2821,
                 major
+        );
+
+
+        // --------------------------------------------------------
+        // Comprobar tipo.
+        // --------------------------------------------------------
+
+        assertEquals(
+                11,
+                tipo
+        );
+
+
+        // --------------------------------------------------------
+        // Comprobar contador.
+        // --------------------------------------------------------
+
+        assertEquals(
+                5,
+                contador
         );
 
 

@@ -5,12 +5,37 @@
 -- Pruebas sencillas de integración para comprobar
 -- el funcionamiento de la tabla MEDICIONES.
 --
+-- Las filas utilizadas por las pruebas se eliminan antes
+-- de comenzar para permitir ejecutar este archivo varias veces.
+--
 -- Autor: Élia Garcia Pons
--- Fecha: 13/10/2026
+-- Fecha: 14/10/2026
 --
 -- Copyright:
 -- Uso académico - Proyecto de Biometría y Medio Ambiente.
+--
+-- Aportación:
+-- Comprueba la inserción y recuperación de mediciones
+-- en la base de datos del Sprint 0.
 -- ------------------------------------------------------------
+
+
+-- ------------------------------------------------------------
+-- Preparación de las pruebas
+--
+-- Eliminar únicamente las filas utilizadas por este test
+-- para que pueda ejecutarse varias veces sin producir
+-- errores por clave primaria duplicada.
+-- ------------------------------------------------------------
+
+DELETE FROM MEDICIONES
+WHERE
+    identificador_sensor =
+        '45505347-2D47-5449-2D50-524F592D3341'
+    AND fecha_hora IN (
+        '2026-10-13 17:00:00',
+        '2026-10-13 17:00:05'
+    );
 
 
 -- ------------------------------------------------------------
@@ -50,7 +75,8 @@ SELECT
     tipo
 FROM MEDICIONES
 WHERE
-    fecha_hora = '2026-10-13 17:00:00'
+    fecha_hora =
+        '2026-10-13 17:00:00'
     AND identificador_sensor =
         '45505347-2D47-5449-2D50-524F592D3341';
 
@@ -79,7 +105,8 @@ VALUES (
 -- ------------------------------------------------------------
 -- TEST 4
 --
--- Recuperar todas las mediciones ordenadas por fecha/hora.
+-- Recuperar las dos mediciones utilizadas por este test
+-- ordenadas por fecha/hora.
 -- ------------------------------------------------------------
 
 SELECT
@@ -88,4 +115,11 @@ SELECT
     identificador_sensor,
     tipo
 FROM MEDICIONES
+WHERE
+    identificador_sensor =
+        '45505347-2D47-5449-2D50-524F592D3341'
+    AND fecha_hora IN (
+        '2026-10-13 17:00:00',
+        '2026-10-13 17:00:05'
+    )
 ORDER BY fecha_hora ASC;

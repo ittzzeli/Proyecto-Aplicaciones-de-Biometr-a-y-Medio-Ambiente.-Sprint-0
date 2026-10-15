@@ -12,6 +12,12 @@
 #include <iostream>
 #include "CodificadorMajor.h"
 
+// --------------------------------------------------------------
+// main() --> resultado: Z
+// --------------------------------------------------------------
+// Ejecuta las comprobaciones de codificación y decodificación del
+// Major y devuelve 0 cuando todas las aserciones son correctas.
+// --------------------------------------------------------------
 int main() {
   // O3 = 11 = 0x0B, contador = 5 = 0x05
   uint16_t majorO3 = CodificadorMajor::construirMajor(11, 5);

@@ -22,6 +22,10 @@
 //
 // Copyright:
 // Uso académico - Proyecto de Biometría y Medio Ambiente.
+//
+// Aportación:
+// Implementa las operaciones de almacenamiento y recuperación de
+// mediciones manteniendo la lógica de negocio independiente de HTTP.
 // ------------------------------------------------------------
 
 

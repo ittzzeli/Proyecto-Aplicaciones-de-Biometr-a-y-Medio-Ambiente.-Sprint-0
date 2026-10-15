@@ -20,6 +20,10 @@
 //
 // Copyright:
 // Uso académico - Proyecto de Biometría y Medio Ambiente.
+//
+// Aportación:
+// Verifica automáticamente las rutas, validaciones y delegación
+// del componente de comunicación REST.
 // ------------------------------------------------------------
 
 
@@ -49,6 +53,9 @@ class LogicaNegocioFake
     // --> leerDatos()
     // --> resultado: B
     // ------------------------------------------------------------
+    //
+    // Registra la medición recibida y simula el resultado de guardado.
+    // ------------------------------------------------------------
     public function leerDatos(
         object $medicion
     ): bool {
@@ -66,6 +73,9 @@ class LogicaNegocioFake
     // mostrarDatos()
     // --> medicion: Medicion
     // ------------------------------------------------------------
+    //
+    // Devuelve la última medición registrada por la lógica fake.
+    // ------------------------------------------------------------
     public function mostrarDatos(): ?object
     {
         $this->vecesMostrarDatos++;
@@ -79,6 +89,9 @@ class LogicaNegocioFake
 // condicion: B,
 // mensaje: Text
 // --> comprobar() -->
+// ------------------------------------------------------------
+//
+// Comprueba una condición del test y lanza una excepción si falla.
 // ------------------------------------------------------------
 function comprobar(
     bool $condicion,
