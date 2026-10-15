@@ -8,3 +8,8 @@ Thumbs.db
 # Archivos temporales
 *.tmp
 *.log
+
+# Archivos generados al compilar
+build/
+*.class
+*.exe
